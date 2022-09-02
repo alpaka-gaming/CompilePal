@@ -1,0 +1,146 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>disable</ImplicitUsings>
+        <Nullable>disable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
+      <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Process\VBSP\parameters.json" />
+      <Content Include="Parameters\VBSP\parameters.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Process\CUBEMAPS\meta.json" />
+      <Content Include="Parameters\CUBEMAPS\meta.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Process\VVIS\parameters.json" />
+      <Content Include="Parameters\VVIS\parameters.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Process\VRAD\meta.json" />
+      <Content Include="Parameters\VRAD\meta.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Process\CUBEMAPS\parameters.json" />
+      <Content Include="Parameters\CUBEMAPS\parameters.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Process\VBSP\meta.json" />
+      <Content Include="Parameters\VBSP\meta.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Process\UTILITY\parameters.json" />
+      <Content Include="Parameters\UTILITY\parameters.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Process\UTILITY\meta.json" />
+      <Content Include="Parameters\UTILITY\meta.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Process\NAV\meta.json" />
+      <Content Include="Parameters\NAV\meta.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Process\STATS\parameters.json" />
+      <Content Include="Parameters\STATS\parameters.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Process\REPACK\meta.json" />
+      <Content Include="Parameters\REPACK\meta.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Process\REPACK\parameters.json" />
+      <Content Include="Parameters\REPACK\parameters.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Process\VRAD\parameters.json" />
+      <Content Include="Parameters\VRAD\parameters.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Process\COPY\meta.json" />
+      <Content Include="Parameters\COPY\meta.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Process\VVIS\meta.json" />
+      <Content Include="Parameters\VVIS\meta.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Process\COPY\parameters.json" />
+      <Content Include="Parameters\COPY\parameters.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Process\PACK\parameters.json" />
+      <Content Include="Parameters\PACK\parameters.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Process\PACK\meta.json" />
+      <Content Include="Parameters\PACK\meta.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Process\SHUTDOWN\parameters.json" />
+      <Content Include="Parameters\SHUTDOWN\parameters.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Process\SHUTDOWN\meta.json" />
+      <Content Include="Parameters\SHUTDOWN\meta.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Process\NAV\parameters.json" />
+      <Content Include="Parameters\NAV\parameters.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Process\CUSTOM\meta.json" />
+      <Content Include="Parameters\CUSTOM\meta.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Process\CUSTOM\parameters.json" />
+      <Content Include="Parameters\CUSTOM\parameters.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Process\GAME\parameters.json" />
+      <Content Include="Parameters\GAME\parameters.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Process\GAME\meta.json" />
+      <Content Include="Parameters\GAME\meta.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Process\STATS\meta.json" />
+      <Content Include="Parameters\STATS\meta.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Presets\Fast\copy.csv" />
+      <Content Include="Presets\Fast\copy.csv">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Presets\Fast\game.csv" />
+      <Content Include="Presets\Fast\game.csv">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Presets\Fast\meta.json" />
+      <Content Include="Presets\Fast\meta.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Presets\Fast\vbsp.csv" />
+      <Content Include="Presets\Fast\vbsp.csv">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Presets\Fast\vrad.csv" />
+      <Content Include="Presets\Fast\vrad.csv">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Presets\Fast\vvis.csv" />
+      <Content Include="Presets\Fast\vvis.csv">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
+</Project>

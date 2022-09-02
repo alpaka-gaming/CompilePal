@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Compiler": {
+      "commandName": "Project",
+      "commandLineArgs": "/map:sdk_lockdown.wmf /game:hl2mp"
+    }
+  }
+}
