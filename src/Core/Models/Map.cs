@@ -32,7 +32,7 @@ namespace Core.Models
         /// <summary>
         /// Map name without version identifiers
         /// </summary>
-        public string MapName
+        public string Name
         {
             get
             {
@@ -51,6 +51,11 @@ namespace Core.Models
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public override string ToString()
+        {
+            return Name;
         }
     }
 }

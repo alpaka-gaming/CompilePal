@@ -21,10 +21,18 @@ namespace Core.Commands
             // Metadata = new Metadata();
             // Process = new System.Diagnostics.Process();
         }
+        
+        public string Name { get; set; }
+        public async void StartAsync()
+        {
+            Process.Start();
+            await Process.WaitForExitAsync();
+        }
 
         // public List<Exception> CompileExceptions { get; private set; } = new();
         public System.Diagnostics.Process Process { get; private protected set; }
         
+
         // public Metadata Metadata { get; private set; }
         //
         // //private string _parameterFolder = "./Parameters";

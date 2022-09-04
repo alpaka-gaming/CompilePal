@@ -7,7 +7,7 @@ namespace Core.Helpers
 {
     public sealed class SettingParser
     {
-        public static List<Setting> Parse(string binFolder)
+        public static IEnumerable<Setting> Parse(string binFolder)
         {
             // prioritize hammer++ configs, fallback to hammer if it doesn't exist
             var filename = Path.Combine(binFolder, "hammerplusplus", "hammerplusplus_gameconfig.txt");
@@ -19,16 +19,10 @@ namespace Core.Helpers
             var gameInfos = new List<Setting>();
 
             var data = new FileData(filename);
-            foreach (var gamedb in data.headnode.GetFirstByName(new[]
-                         {
-                             "\"Configs\"", "\"GameConfig.txt\""
-                         })
+            foreach (var gamedb in data.headnode.GetFirstByName(new[] { "\"Configs\"", "\"GameConfig.txt\"" })
                          .GetFirstByName("\"Games\"").subBlocks)
             {
-                var hdb = gamedb.GetFirstByName(new[]
-                {
-                    "\"Hammer\"", "\"hammer\""
-                });
+                var hdb = gamedb.GetFirstByName(new[] { "\"Hammer\"", "\"hammer\"" });
 
                 //CompilePalLogger.LogLineDebug($"Gamedb: {gamedb}");
                 var game = new Setting

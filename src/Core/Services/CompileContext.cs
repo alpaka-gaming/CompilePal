@@ -1,16 +1,49 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using Core.Interfaces;
 using Core.Models;
 using Microsoft.Extensions.Logging;
 
 namespace Core.Services
 {
-    public class CompileContext : ICompileContext
+    public class CompileContext : ICompileContext, INotifyPropertyChanged
     {
         public IParameterManager ParameterManager { get; }
         public IPresetManager PresetManager { get; }
+
+        private Map _currentMap;
+        public Map CurrentMap
+        {
+            get => _currentMap;
+            set
+            {
+                SetField(ref _currentMap, value);
+            }
+        }
+
+        private Preset _currentPreset;
+        public Preset CurrentPreset
+        {
+            get => _currentPreset;
+            set
+            {
+                SetField(ref _currentPreset, value);
+            }
+        }
+        
+        private ICommand _currentCommand;
+        public ICommand CurrentCommand
+        {
+            get => _currentCommand;
+            set
+            {
+                SetField(ref _currentCommand, value);
+            }
+        }
 
         public ISettingManager SettingManager { get; }
 
@@ -35,37 +68,44 @@ namespace Core.Services
             Compile(new Map(mapFile));
         }
 
-        public void Compile(Map map, Action<Preset> preset)
+        public async void Compile(Map map, Action<Preset> preset)
         {
             var model = new Preset();
             preset?.Invoke(model);
             model.AdHoc = true;
             PresetManager.Add(model);
-            PresetManager.Set(map.MapName, model.Name);
+            PresetManager.Set(map.Name, model.Name);
 
             var executionPlan = buildExecutionPlan(map, model);
             var sw1 = Stopwatch.StartNew();
             foreach (var item in executionPlan)
             {
+                CurrentCommand = item.Value;
+                
                 _logger.LogInformation("Executing {Key}", item.Key);
                 var sw2 = Stopwatch.StartNew();
                 //TODO: DO SOME WORK
-                item.Value.Start();
+                await item.Value.StartAsync();
+                
                 sw2.Stop();
             }
             sw1.Stop();
 
             throw new NotImplementedException();
         }
-        private IDictionary<string, System.Diagnostics.Process> buildExecutionPlan(Map map, Preset preset)
+        public void Compile(Map map)
         {
+            Compile(map, null);
+        }
+
+        private IDictionary<string, ICommand> buildExecutionPlan(Map map, Preset preset)
+        {
+            
+            
             throw new NotImplementedException();
         }
 
-        public void Compile(Map map)
-        {
-            throw new NotImplementedException();
-        }
+        public event ProgressChangedEventHandler ProgressChanged;
 
         #region IDisposable
 
@@ -92,5 +132,19 @@ namespace Core.Services
 
         #endregion
 
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        protected bool SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
+        {
+            if (EqualityComparer<T>.Default.Equals(field, value))
+                return false;
+            field = value;
+            OnPropertyChanged(propertyName);
+            return true;
+        }
     }
 }

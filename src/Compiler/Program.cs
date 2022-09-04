@@ -114,6 +114,12 @@ namespace Compiler
             using (var scope = Container.CreateScope())
             using (var context = scope.ServiceProvider.GetRequiredService<ICompileContext>())
             {
+                context.ProgressChanged += (sender, eventArgs) =>
+                {
+                    var currentContext = (ICompileContext)sender;
+                    if (currentContext != null)
+                        Logger.LogInformation("[{MapName}] {StageName} progress: {Progress}", currentContext.CurrentMap, currentContext.CurrentCommand,  eventArgs.ProgressPercentage);
+                };
                 if (context == null) throw new NullReferenceException("Unable to create a compile context");
                 context.Compile(_map, preset =>
                 {
