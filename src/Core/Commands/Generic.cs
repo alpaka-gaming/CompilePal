@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading;
+using System.Threading.Tasks;
 using Core.Interfaces;
 using Core.Models;
 using Microsoft.Extensions.Logging;
@@ -23,7 +24,7 @@ namespace Core.Commands
         }
         
         public string Name { get; set; }
-        public async void StartAsync()
+        public async Task StartAsync()
         {
             Process.Start();
             await Process.WaitForExitAsync();

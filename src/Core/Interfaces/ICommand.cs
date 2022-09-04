@@ -1,3 +1,5 @@
+using System.Threading.Tasks;
+
 namespace Core.Interfaces
 {
     public interface ICommand
@@ -5,6 +7,6 @@ namespace Core.Interfaces
         ICompileContext Context { get; }
         System.Diagnostics.Process Process { get; }
         string Name { get; set; }
-        void StartAsync();
+        Task StartAsync();
     }
 }

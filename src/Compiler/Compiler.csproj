@@ -37,6 +37,7 @@
       <None Remove="appsettings.Development.json" />
       <Content Include="appsettings.Development.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <DependentUpon>appsettings.json</DependentUpon>
       </Content>
     </ItemGroup>
 
