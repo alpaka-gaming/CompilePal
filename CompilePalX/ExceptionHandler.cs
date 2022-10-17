@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Threading;
-using System.Windows;
-using System.Windows.Shell;
 using CompilePalX.Compiling;
 using MahApps.Metro.Controls.Dialogs;
 

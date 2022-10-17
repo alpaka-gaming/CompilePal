@@ -1,8 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.IO;
-using System.Windows.Documents;
 using CompilePalX.Compiling;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
