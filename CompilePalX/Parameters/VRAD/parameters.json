@@ -15,9 +15,9 @@
     "CanHaveValue": false,
     "Warning": "",
     "IncompatibleGames": [
-      730, // csgo
-      550 // l4d2
-    ] 
+      730,
+      550
+    ]
   },
   {
     "Name": "HDR",
@@ -35,9 +35,9 @@
     "CanHaveValue": false,
     "Warning": "",
     "IncompatibleGames": [
-      730, // csgo
-      550 // l4d2
-    ] 
+      730,
+      550
+    ]
   },
   {
     "Name": "Fast",
@@ -104,8 +104,8 @@
     "CanHaveValue": false,
     "Warning": "",
     "CompatibleGames": [
-      730 // csgo
-    ] 
+      730
+    ]
   },
   {
     "Name": "Static Prop Lighting Old",
@@ -115,8 +115,8 @@
     "CanHaveValue": false,
     "Warning": "",
     "CompatibleGames": [
-      730 // csgo
-    ] 
+      730
+    ]
   },
   {
     "Name": "Static Prop Bounce",
@@ -126,8 +126,8 @@
     "CanHaveValue": true,
     "Warning": "",
     "CompatibleGames": [
-      730 // csgo
-    ] 
+      730
+    ]
   },
   {
     "Name": "Static Prop Sample Scale",
@@ -137,8 +137,8 @@
     "CanHaveValue": true,
     "Warning": "Note that adding -final is the same as having -StaticPropSampleScale 16.",
     "CompatibleGames": [
-      730 // csgo
-    ] 
+      730
+    ]
   },
   {
     "Name": "Static Prop Polys",
@@ -180,8 +180,8 @@
     "CanHaveValue": true,
     "Warning": "",
     "CompatibleGames": [
-      730 // csgo
-    ] 
+      730
+    ]
   },
   {
     "Name": "Threads",

@@ -54,7 +54,7 @@
     "Value": null,
     "CanHaveValue": false,
     "Warning": ""
-  }, 
+  },
   {
     "Name": "Verbose",
     "Parameter": " -verbose",

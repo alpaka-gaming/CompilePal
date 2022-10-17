@@ -23,8 +23,8 @@
     "CanHaveValue": false,
     "Warning": "",
     "CompatibleGames": [
-      440 //tf2
-    ] 
+      440
+    ]
   },
   {
     "Name": "Include",
@@ -42,7 +42,7 @@
     "Description": "Packs all files in specified directory",
     "Value": null,
     "ValueIsFile": true,
-    "ValueIsFolder": true, 
+    "ValueIsFolder": true,
     "CanHaveValue": true,
     "Warning": "",
     "CanBeUsedMoreThanOnce": true
@@ -62,8 +62,8 @@
     "Parameter": " -excludedir",
     "Description": "Ignores this folder when looking for assets",
     "Value": null,
-    "ValueIsFile": true, 
-    "ValueIsFolder": true, 
+    "ValueIsFile": true,
+    "ValueIsFolder": true,
     "CanHaveValue": true,
     "Warning": "",
     "CanBeUsedMoreThanOnce": true
@@ -87,9 +87,9 @@
     "Warning": "",
     "CanBeUsedMoreThanOnce": false,
     "CompatibleGames": [
-      550, //l4d2
-      620 //portal 2
-    ] 
+      550,
+      620
+    ]
   },
   {
     "Name": "Addon Info",
@@ -101,9 +101,9 @@
     "Warning": "",
     "CanBeUsedMoreThanOnce": false,
     "CompatibleGames": [
-      550, //l4d2
-      620 //portal 2
-    ] 
+      550,
+      620
+    ]
   },
   {
     "Name": "Include File List",

@@ -95,8 +95,8 @@
     "CanHaveValue": false,
     "Warning": "",
     "CompatibleGames": [
-      730 // csgo
-    ] 
+      730
+    ]
   },
   {
     "Name": "Static Prop Combine - Keep Sources",
@@ -106,8 +106,8 @@
     "CanHaveValue": false,
     "Warning": "",
     "CompatibleGames": [
-      730 // csgo
-    ] 
+      730
+    ]
   },
   {
     "Name": "Static Prop Combine - Consider VIS",
@@ -117,8 +117,8 @@
     "CanHaveValue": false,
     "Warning": "",
     "CompatibleGames": [
-      730 // csgo
-    ] 
+      730
+    ]
   },
   {
     "Name": "Static Prop Combine - Autocombine",
@@ -128,8 +128,8 @@
     "CanHaveValue": false,
     "Warning": "",
     "CompatibleGames": [
-      730 // csgo
-    ] 
+      730
+    ]
   },
   {
     "Name": "Static Prop Combine - Suggest Rules",
@@ -139,8 +139,8 @@
     "CanHaveValue": false,
     "Warning": "",
     "CompatibleGames": [
-      730 // csgo
-    ] 
+      730
+    ]
   },
   {
     "Name": "Static Prop Combine - Min Instances",
@@ -150,8 +150,8 @@
     "CanHaveValue": true,
     "Warning": "",
     "CompatibleGames": [
-      730 // csgo
-    ] 
+      730
+    ]
   },
   {
     "Name": "Static Prop Combine - Print Combine Rules",
@@ -161,8 +161,8 @@
     "CanHaveValue": false,
     "Warning": "",
     "CompatibleGames": [
-      730 // csgo
-    ] 
+      730
+    ]
   },
   {
     "Name": "Static Prop Combine - Color Instances",
@@ -172,8 +172,8 @@
     "CanHaveValue": false,
     "Warning": "",
     "CompatibleGames": [
-      730 // csgo
-    ] 
+      730
+    ]
   },
   {
     "Name": "Static Prop Combine Ignore - Fast Reflection",
@@ -183,8 +183,8 @@
     "CanHaveValue": false,
     "Warning": "",
     "CompatibleGames": [
-      730 // csgo
-    ] 
+      730
+    ]
   },
   {
     "Name": "Static Prop Combine Ignore - Normals",
@@ -194,8 +194,8 @@
     "CanHaveValue": false,
     "Warning": "",
     "CompatibleGames": [
-      730 // csgo
-    ] 
+      730
+    ]
   },
   {
     "Name": "Static Prop Combine Ignore - No Shadow",
@@ -205,8 +205,8 @@
     "CanHaveValue": false,
     "Warning": "",
     "CompatibleGames": [
-      730 // csgo
-    ] 
+      730
+    ]
   },
   {
     "Name": "Static Prop Combine Ignore - No Vertex Lighting",
@@ -216,8 +216,8 @@
     "CanHaveValue": false,
     "Warning": "",
     "CompatibleGames": [
-      730 // csgo
-    ] 
+      730
+    ]
   },
   {
     "Name": "Static Prop Combine Ignore - No Flashlight",
@@ -227,8 +227,8 @@
     "CanHaveValue": false,
     "Warning": "",
     "CompatibleGames": [
-      730 // csgo
-    ] 
+      730
+    ]
   },
   {
     "Name": "Static Prop Combine Ignore - No Self Shadowing",
@@ -238,8 +238,8 @@
     "CanHaveValue": false,
     "Warning": "",
     "CompatibleGames": [
-      730 // csgo
-    ] 
+      730
+    ]
   },
   {
     "Name": "Static Prop Combine Ignore - Disable Shadow Depth",
@@ -249,7 +249,7 @@
     "CanHaveValue": false,
     "Warning": "",
     "CompatibleGames": [
-      730 // csgo
-    ] 
+      730
+    ]
   }
 ]

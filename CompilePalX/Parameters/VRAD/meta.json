@@ -8,5 +8,5 @@
   "Warning": "",
   "PresetDefault": false,
   "BasisString": " -game $game$ $vmfFile$",
-  "CheckExitCode": false 
+  "CheckExitCode": false
 }
