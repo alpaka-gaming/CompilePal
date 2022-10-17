@@ -20,7 +20,11 @@ namespace CompilePalX
 
             try {
                 AnalyticsManager.Error();//risky, but /interesting/
-            } catch (Exception) {}
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
 
             if (crash)
             {

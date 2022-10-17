@@ -684,7 +684,10 @@ namespace CompilePalX.Compilers.BSPPack
 		                        var directories = Directory.GetDirectories(fullPath);
 		                        sourceDirectories.AddRange(directories);
 	                        }
-	                        catch { }
+                            catch
+                            {
+                                // ignored
+                            }
                         }
                         else if (path.Contains("|gameinfo_path|"))
                         {

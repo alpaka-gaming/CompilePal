@@ -259,6 +259,7 @@ namespace CompilePalX
             }
             catch
             {
+                // ignored
             }
             IsCompiling = false;
 

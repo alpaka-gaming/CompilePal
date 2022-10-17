@@ -46,7 +46,10 @@ namespace CompilePalX.Compiling
                 File.AppendAllText(logFile, text);
 
             }
-            catch { }
+            catch
+            {
+                // ignored
+            }
 
             return OnWrite?.Invoke(text, b);
         }
@@ -83,7 +86,11 @@ namespace CompilePalX.Compiling
             try
             {
                 File.AppendAllText(logFile, s);
-            } catch { }
+            }
+            catch
+            {
+                // ignored
+            }
 #endif
         }
 

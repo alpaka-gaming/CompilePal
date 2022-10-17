@@ -47,15 +47,21 @@ namespace CompilePalX
                 foreach (var cpu in cpus)//Just for all those people with two cpus
                     id += cpu.Properties["processorID"].Value.ToString();
             }
-            catch { }
+            catch
+            {
+                // ignored
+            }
             try
             {
                 ManagementObject disk = new ManagementObject("win32_logicaldisk.deviceid=\"C:\"");
                 disk.Get();
                 id += disk["VolumeSerialNumber"].ToString();
             }
-            catch { }
-            
+            catch
+            {
+                // ignored
+            }
+
             return GetHashString(id);
         }
 
