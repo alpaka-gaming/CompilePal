@@ -8,10 +8,17 @@
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
     <SelfContained>True</SelfContained>
     <DebugType>embedded</DebugType>
+    <LangVersion>default</LangVersion>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>CompilePalIcon.ico</ApplicationIcon>
     <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
     <Resource Include="CompilePalIcon.ico" />
