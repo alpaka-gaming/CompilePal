@@ -44,7 +44,7 @@ namespace CompilePalX
 
                     try
                     {
-	                    var c = new HttpClient();
+	                    HttpClient? c = new HttpClient();
 	                    string result = await c.GetStringAsync(new Uri(errorURL));
 
 	                    LoadErrorData(result);
@@ -77,7 +77,7 @@ namespace CompilePalX
         {
             string style = File.ReadAllText(errorStyle);
 
-            var lines = input.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
+            string[]? lines = input.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
 
             int count = int.Parse(lines[0]);
 
@@ -86,13 +86,13 @@ namespace CompilePalX
             {
                 Error error = new Error();
 
-                var data = lines[i].Split('|');
+                string[]? data = lines[i].Split('|');
 
                 error.Severity = int.Parse(data[0]);
                 error.RegexTrigger = new Regex(data[1]);
                 i++;
 
-                var shortDesc = errorDescriptionPattern.Match(lines[i]);
+                Match? shortDesc = errorDescriptionPattern.Match(lines[i]);
                 error.ShortDescription = shortDesc.Success ? shortDesc.Groups[1].Value : "unknown error";
 
                 error.Message = style.Replace("%content%", lines[i]);
@@ -108,11 +108,11 @@ namespace CompilePalX
 
         public static Error? GetError(string line)
         {
-            foreach (var error in errorList)
+            foreach (Error? error in errorList)
             {
                 if (error.RegexTrigger.IsMatch(line))
                 {
-	                var err = error.Clone() as Error;
+	                Error? err = error.Clone() as Error;
 					// remove all control chars
 	                err.ShortDescription = new string(line.Where(c => !char.IsControl(c)).ToArray());;
                     return err;

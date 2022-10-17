@@ -52,9 +52,9 @@ namespace CompilePalX
         public static void ModifyCurrentContext(string val)
         {
             val = val.Replace("COMPILE_PAL_SET ", "");
-            var firstSpace = val.IndexOf(" ");
-            var field = val.Substring(0, firstSpace);
-            var value = val.Substring(firstSpace + 1).Replace("\"", "");
+            int firstSpace = val.IndexOf(" ");
+            string? field = val.Substring(0, firstSpace);
+            string? value = val.Substring(firstSpace + 1).Replace("\"", "");
 
             switch (field)
             {
@@ -128,7 +128,7 @@ namespace CompilePalX
             //Loading the last used configurations for hammer
             RegistryKey? rk = Registry.CurrentUser.OpenSubKey(@"Software\Valve\Hammer\General");
 
-            var configs = new List<GameConfiguration>();
+            List<GameConfiguration>? configs = new List<GameConfiguration>();
 
             //try loading json
             if (File.Exists(GameConfigurationsPath))

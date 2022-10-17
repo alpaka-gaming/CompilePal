@@ -36,7 +36,7 @@ namespace CompilePalX.KV
         /// <returns>Formatted KV string</returns>
         public static string GetFormattedKVString(string kv)
         {
-            var formatted = new StringBuilder();
+            StringBuilder? formatted = new StringBuilder();
 
             int startIndex = 0;
             int lineQuoteCount = 0;
@@ -57,7 +57,7 @@ namespace CompilePalX.KV
                 {
                     if (i > startIndex)
                     {
-                        var beforeCloseBraceText = kv.Substring(startIndex, i - startIndex).Trim();
+                        string? beforeCloseBraceText = kv.Substring(startIndex, i - startIndex).Trim();
                         if (beforeCloseBraceText != "")
                             formatted.AppendLine(beforeCloseBraceText);
                     }
@@ -109,7 +109,7 @@ namespace CompilePalX.KV
 
         private static DataBlock ParseDataBlock(ref StringReader reader, string name = "")
         {
-            var block = new DataBlock
+            DataBlock? block = new DataBlock
             {
                 name = name.Trim()
             };
@@ -155,13 +155,13 @@ namespace CompilePalX.KV
 
         public static DataBlock FromString(string block, string name = "")
         {
-            var reader = new StringReader(block);
+            StringReader? reader = new StringReader(block);
             return ParseDataBlock(ref reader, name);
         }
 
         public static DataBlock FromStream(ref StreamReader stream, string name = "") 
         {
-            var reader = new StringReader(stream.ReadToEnd());
+            StringReader? reader = new StringReader(stream.ReadToEnd());
             return ParseDataBlock(ref reader, name);
         }
 

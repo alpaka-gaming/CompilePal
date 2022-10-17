@@ -39,7 +39,7 @@ namespace CompilePalX
                 string[] commandLineArgs = Environment.GetCommandLineArgs();
                 for (int i = 0; i < commandLineArgs.Length; i++)
                 {
-	                var arg = commandLineArgs[i];
+	                string? arg = commandLineArgs[i];
                     try
                     {
                         // look for game args
@@ -77,7 +77,7 @@ namespace CompilePalX
 			// if main window already exists update title
             if (MainWindow.Instance == null)
             {
-				var c = new MainWindow();
+				MainWindow? c = new MainWindow();
 				c.Show();
             }
             else
@@ -103,7 +103,7 @@ namespace CompilePalX
             if (dep is Button b && b.Name != "LaunchButton")
                 return;
 
-            var selectedItem = (GameConfiguration?)GameGrid.SelectedItem;
+            GameConfiguration? selectedItem = (GameConfiguration?)GameGrid.SelectedItem;
 
             if (selectedItem != null)
                 Launch(selectedItem);
@@ -142,16 +142,16 @@ namespace CompilePalX
 
         private void EditButton_OnClick(object sender, RoutedEventArgs e)
         {
-            var configuration = (GameConfiguration)((Button)sender).DataContext;
+            GameConfiguration? configuration = (GameConfiguration)((Button)sender).DataContext;
             int configIndex = GameConfigurationManager.GameConfigurations.IndexOf(configuration);
             GameConfigurationWindow.Instance.Open(configuration.Clone() as GameConfiguration, configIndex);
         }
 
         private async void DeleteButton_OnClick(object sender, RoutedEventArgs e)
         {
-            var configuration = (GameConfiguration)((Button)sender).DataContext;
+            GameConfiguration? configuration = (GameConfiguration)((Button)sender).DataContext;
 
-            var dialogSettings = new MetroDialogSettings()
+            MetroDialogSettings? dialogSettings = new MetroDialogSettings()
             {
                 AffirmativeButtonText = "Delete",
                 NegativeButtonText = "Cancel",
@@ -160,7 +160,7 @@ namespace CompilePalX
                 DefaultButtonFocus = MessageDialogResult.Affirmative,
             };
 
-            var result = await this.ShowMessageAsync($"Delete Game", $"Are you sure you want to delete {configuration.Name}?",
+            MessageDialogResult result = await this.ShowMessageAsync($"Delete Game", $"Are you sure you want to delete {configuration.Name}?",
                 MessageDialogStyle.AffirmativeAndNegative, dialogSettings);
 
             if (result != MessageDialogResult.Affirmative)

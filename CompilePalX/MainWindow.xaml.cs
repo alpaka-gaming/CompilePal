@@ -109,7 +109,7 @@ namespace CompilePalX
             string[] commandLineArgs = Environment.GetCommandLineArgs();
             for (int i = 0; i < commandLineArgs.Length; i++)
             {
-	            var arg = commandLineArgs[i];
+	            string? arg = commandLineArgs[i];
                 try
                 {
                     if (!ignoreWipeArg)
@@ -130,7 +130,7 @@ namespace CompilePalX
                         if (i + 1 > commandLineArgs.Length)
 	                        break;
 
-                        var argPath = commandLineArgs[i + 1];
+                        string? argPath = commandLineArgs[i + 1];
 
                         if (File.Exists(argPath))
                         {
@@ -164,7 +164,7 @@ namespace CompilePalX
                     errorLink.Click += errorLink_Click;
                 }
 
-                var underline = new TextDecoration
+                TextDecoration? underline = new TextDecoration
                 {
                     Location = TextDecorationLocation.Underline,
                     Pen = new Pen(e.ErrorColor, 1),
@@ -181,7 +181,7 @@ namespace CompilePalX
 
         static void errorLink_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            var link = (Hyperlink)sender;
+            Hyperlink? link = (Hyperlink)sender;
             Error error = (Error)link.DataContext;
 
             ErrorFinder.ShowErrorDialog(error);
@@ -214,7 +214,7 @@ namespace CompilePalX
         {
             Dispatcher.Invoke(() =>
             {
-                foreach (var run in removals)
+                foreach (Run? run in removals)
                 {
                     run.Text = "";
                 }
@@ -258,7 +258,7 @@ namespace CompilePalX
                 {
                     if (o is not Preset preset) return false;;
 
-                    var map = GetCurrentMap();
+                    Map? map = GetCurrentMap();
 
                     // if no map is selected, show only global presets
                     if (map == null)
@@ -467,7 +467,7 @@ namespace CompilePalX
 
         private void AddPresetButton_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new PresetDialog("Add Preset", MapListBox.SelectedItem as Map);
+            PresetDialog? dialog = new PresetDialog("Add Preset", MapListBox.SelectedItem as Map);
             dialog.ShowDialog();
 
             if (dialog.Result)
@@ -478,11 +478,11 @@ namespace CompilePalX
                 string? map = null;
                 if (isMapSpecific)
                 {
-                    var m = MapListBox.SelectedItem as Map;
+                    Map? m = MapListBox.SelectedItem as Map;
                     map = m?.MapName;
                 }
 
-                var preset = ConfigurationManager.NewPreset(presetName, map);
+                Preset? preset = ConfigurationManager.NewPreset(presetName, map);
 
                 AnalyticsManager.NewPreset();
 
@@ -495,7 +495,7 @@ namespace CompilePalX
         {
             if (ConfigurationManager.CurrentPreset != null)
             {
-                var dialog = new PresetDialog("Clone Preset", MapListBox.SelectedItem as Map);
+                PresetDialog? dialog = new PresetDialog("Clone Preset", MapListBox.SelectedItem as Map);
                 dialog.ShowDialog();
 
                 if (dialog.Result)
@@ -506,11 +506,11 @@ namespace CompilePalX
                     string? map = null;
                     if (isMapSpecific)
                     {
-                        var m = MapListBox.SelectedItem as Map;
+                        Map? m = MapListBox.SelectedItem as Map;
                         map = m?.MapName;
                     }
 
-                    var preset = ConfigurationManager.ClonePreset(presetName, map);
+                    Preset? preset = ConfigurationManager.ClonePreset(presetName, map);
 
                     AnalyticsManager.NewPreset();
 
@@ -523,7 +523,7 @@ namespace CompilePalX
 
         private void RemovePresetButton_Click(object sender, RoutedEventArgs e)
         {
-            var selectedItem = (Preset)PresetConfigListBox.SelectedItem;
+            Preset? selectedItem = (Preset)PresetConfigListBox.SelectedItem;
 
             if (selectedItem != null)
                 ConfigurationManager.RemovePreset(selectedItem);
@@ -535,7 +535,7 @@ namespace CompilePalX
             // update all maps referencing the deleted preset to be default
             for (int i = 0; i < MapListBox.Items.Count; i++)
             {
-                var map = MapListBox.Items[i] as Map;
+                Map? map = MapListBox.Items[i] as Map;
                 if (map.Preset != null && map.Preset.Equals(selectedItem))
                     map.Preset = (Preset) PresetConfigListBox.SelectedItem;
             }
@@ -703,7 +703,7 @@ namespace CompilePalX
 
         private void AddMapButton_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new OpenFileDialog();
+            OpenFileDialog? dialog = new OpenFileDialog();
 
             if (GameConfigurationManager.GameConfiguration.SDKMapFolder != null)
                 dialog.InitialDirectory = GameConfigurationManager.GameConfiguration.SDKMapFolder;
@@ -723,7 +723,7 @@ namespace CompilePalX
 	            dialog.ShowDialog();
             }
 
-            foreach (var file in dialog.FileNames)
+            foreach (string? file in dialog.FileNames)
             {
                 // use current preset if it matches the map, otherwise default to first
                 CompilingManager.MapFiles.Add(new Map(file, preset: ConfigurationManager.CurrentPreset != null && ConfigurationManager.CurrentPreset.IsValidMap(file) ? ConfigurationManager.CurrentPreset : ConfigurationManager.KnownPresets.FirstOrDefault()));
@@ -753,7 +753,7 @@ namespace CompilePalX
 
 	    private void ReadOutput_OnChecked(object sender, RoutedEventArgs e)
 	    {
-		    var selectedItem = (ConfigItem) ProcessDataGrid.SelectedItem;
+		    ConfigItem? selectedItem = (ConfigItem) ProcessDataGrid.SelectedItem;
 
 			//Set readOuput to opposite of it's current value
 		    selectedItem.ReadOutput = !selectedItem.ReadOutput;
@@ -849,8 +849,8 @@ namespace CompilePalX
 
 		private void RowDragHelperOnRowSwitched(object sender, RowSwitchEventArgs e)
 		{
-			var primaryItem = OrderGrid.Items[e.PrimaryRowIndex] as CustomProgram;
-			var displacedItem = OrderGrid.Items[e.DisplacedRowIndex] as CustomProgram;
+			CustomProgram? primaryItem = OrderGrid.Items[e.PrimaryRowIndex] as CustomProgram;
+			CustomProgram? displacedItem = OrderGrid.Items[e.DisplacedRowIndex] as CustomProgram;
 
 			SetOrder(primaryItem, e.PrimaryRowIndex);
 			SetOrder(displacedItem, e.DisplacedRowIndex);
@@ -863,7 +863,7 @@ namespace CompilePalX
             if (target is not CustomProgram program)
 			    return;
             CompilePalLogger.LogDebug($"Setting order of target: {target} to {newOrder}");
-			var programConfig = GetConfigFromCustomProgram(program);
+			ConfigItem? programConfig = GetConfigFromCustomProgram(program);
 
 			if (programConfig == null)
 				return;
@@ -876,7 +876,7 @@ namespace CompilePalX
 		//Search through ProcDataGrid to find corresponding ConfigItem
 		private ConfigItem? GetConfigFromCustomProgram(CustomProgram program)
 	    {
-			foreach (var procSourceItem in ProcessDataGrid.ItemsSource)
+			foreach (object? procSourceItem in ProcessDataGrid.ItemsSource)
 			{
 				if (program.Equals(procSourceItem))
 				{
@@ -915,7 +915,7 @@ namespace CompilePalX
 
         private void TickElapsedTimer(object sender, EventArgs e)
         {
-            var time = CompilingManager.GetTime().Elapsed;
+            TimeSpan time = CompilingManager.GetTime().Elapsed;
             TimeElapsedLabel.Content = $"Time Elapsed: {(int) time.TotalHours:00}:{time:mm}:{time:ss}";
         }
 
@@ -929,7 +929,7 @@ namespace CompilePalX
 	{
 		public static ObservableCollection<T> AddRange<T>(this ObservableCollection<T> collection, IEnumerable<T> range)
 		{
-			foreach (var element in range)
+			foreach (T? element in range)
 				collection.Add(element);
 
 			return collection;
@@ -937,7 +937,7 @@ namespace CompilePalX
 
 		public static ObservableCollection<T> RemoveRange<T>(this ObservableCollection<T> collection, IEnumerable<T> range)
 		{
-			foreach (var element in range)
+			foreach (T? element in range)
 				collection.Remove(element);
 
 			return collection;

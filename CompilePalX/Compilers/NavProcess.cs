@@ -48,7 +48,7 @@ namespace CompilePalX.Compilers
 
                 hidden = GetParameterString().Contains("-hidden");
 
-                var addtionalParameters = Regex.Replace(GetParameterString(), "\b-hidden\b", "");
+                string? addtionalParameters = Regex.Replace(GetParameterString(), "\b-hidden\b", "");
 
                 string args =
                     $"-steam -game \"{context.Configuration.GameFolder}\" -windowed -insecure -novid -nosound +log 0 +sv_logflush 1 +sv_cheats 1 +map {mapname} {addtionalParameters}";
@@ -56,7 +56,7 @@ namespace CompilePalX.Compilers
                 if (hidden)
                     args += " -noborder -x 4000 -y 2000";
 
-                var startInfo = new ProcessStartInfo(context.Configuration.GameEXE, args);
+                ProcessStartInfo? startInfo = new ProcessStartInfo(context.Configuration.GameEXE, args);
                 startInfo.UseShellExecute = false;
                 startInfo.CreateNoWindow = false;
 

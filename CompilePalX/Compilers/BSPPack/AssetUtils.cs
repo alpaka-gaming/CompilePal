@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using CompilePalX.KV;
 
 namespace CompilePalX.Compilers.BSPPack
 {
@@ -161,19 +162,19 @@ namespace CompilePalX.Compilers.BSPPack
                 {
                     mdl.Seek(includeModelIndex, SeekOrigin.Begin);
 
-                    var includeOffsetStart = mdl.Position;
+                    long includeOffsetStart = mdl.Position;
                     for (int j = 0; j < includeModelCount; j++)
                     {
-                        var includeStreamPos = mdl.Position;
+                        long includeStreamPos = mdl.Position;
 
-                        var labelOffset = reader.ReadInt32();
-                        var includeModelPathOffset = reader.ReadInt32();
+                        int labelOffset = reader.ReadInt32();
+                        int includeModelPathOffset = reader.ReadInt32();
 
                         // skip unknown section made up of 27 ints
                         // TODO: not needed?
                         //mdl.Seek(27 * 4, SeekOrigin.Current);
 
-                        var currentOffset = mdl.Position;
+                        long currentOffset = mdl.Position;
 
                         string label = "";
 
@@ -213,16 +214,16 @@ namespace CompilePalX.Compilers.BSPPack
                         kv = kv.Remove(firstNewlineIndex, 1);
 
                     kv = KV.StringUtil.GetFormattedKVString(kv);
-                    var data = KV.DataBlock.FromString(kv);
+                    DataBlock data = KV.DataBlock.FromString(kv);
 
-                    var mdlKvBlock = data.GetFirstByName("mdlkeyvalue");
-                    var doorDefaultsBlock = mdlKvBlock?.GetFirstByName("door_options")?.GetFirstByName("\"defaults\"");
+                    DataBlock? mdlKvBlock = data.GetFirstByName("mdlkeyvalue");
+                    DataBlock? doorDefaultsBlock = mdlKvBlock?.GetFirstByName("door_options")?.GetFirstByName("\"defaults\"");
                     if (doorDefaultsBlock != null)
                     {
-                        var damageModel1 = doorDefaultsBlock.TryGetStringValue("damage1");
+                        string damageModel1 = doorDefaultsBlock.TryGetStringValue("damage1");
                         if (damageModel1 != "")
                             models.Add($"models\\{damageModel1}.mdl");
-                        var damageModel2 = doorDefaultsBlock.TryGetStringValue("damage2");
+                        string damageModel2 = doorDefaultsBlock.TryGetStringValue("damage2");
                         if (damageModel2 != "")
                             models.Add($"models\\{damageModel2}.mdl");
                     }
@@ -340,9 +341,9 @@ namespace CompilePalX.Compilers.BSPPack
         {
             // finds files associated with .mdl
 
-            var references = new List<string>();
+            List<string> references = new List<string>();
 
-            var variations = new List<string> { ".dx80.vtx", ".dx90.vtx", ".phy", ".sw.vtx", ".vtx", ".xbox.vtx", ".vvd", ".ani" };
+            List<string> variations = new List<string> { ".dx80.vtx", ".dx90.vtx", ".phy", ".sw.vtx", ".vtx", ".xbox.vtx", ".vvd", ".ani" };
             foreach (string variation in variations)
             {
                 string variant = Path.ChangeExtension(path, variation);
@@ -410,15 +411,15 @@ namespace CompilePalX.Compilers.BSPPack
             // finds vmt files associated with radar overview files
 
             List<string> DDSs = new List<string>();
-            var overviewFile = new KV.FileData(fullpath);
+            FileData overviewFile = new KV.FileData(fullpath);
 
             // Contains no blocks, return empty list
             if (overviewFile.headnode.subBlocks.Count == 0)
                 return DDSs;
 
-            foreach (var subblock in overviewFile.headnode.subBlocks)
+            foreach (DataBlock subblock in overviewFile.headnode.subBlocks)
             {
-                var material = subblock.TryGetStringValue("material");
+                string material = subblock.TryGetStringValue("material");
                 // failed to get material, file contains no materials
                 if (material == "")
                     break;
@@ -426,12 +427,12 @@ namespace CompilePalX.Compilers.BSPPack
                 // add default radar
                 DDSs.Add($"resource/{vmtPathParser(material, false)}_radar.dds");
 
-                var verticalSections = subblock.GetFirstByName("\"verticalsections\"");
+                DataBlock? verticalSections = subblock.GetFirstByName("\"verticalsections\"");
                 if (verticalSections == null)
                     break;
                 
                 // add multi-level radars
-                foreach (var section in verticalSections.subBlocks)
+                foreach (DataBlock section in verticalSections.subBlocks)
                     DDSs.Add($"resource/{vmtPathParser(material, false)}_{section.name.Replace("\"", string.Empty)}_radar.dds");
             }
 
@@ -476,7 +477,7 @@ namespace CompilePalX.Compilers.BSPPack
             else
             {
                 // strip c style comments like this one
-                var commentIndex = vmtline.IndexOf("//");
+                int commentIndex = vmtline.IndexOf("//");
                 if(commentIndex > -1)
                 {
                     vmtline = vmtline.Substring(0, commentIndex);
@@ -741,7 +742,7 @@ namespace CompilePalX.Compilers.BSPPack
 
             // csgo panorama map icons (.png)
             internalPath = "materials/panorama/images/map_icons/screenshots/"; 
-            var panoramaMapIcons = new List<KeyValuePair<string, string>>();
+            List<KeyValuePair<string, string>> panoramaMapIcons = new List<KeyValuePair<string, string>>();
             foreach (string source in sourceDirectories)
             {
                 string externalPath = source + "/" + internalPath;

@@ -24,7 +24,7 @@ namespace CompilePalX.Compilers.BSPPack
         // onFailure is for utility files such as nav, radar, etc which get excluded. if they are excluded, the Delegate is run. This is used for removing the files from the BSP class, so they dont appear in the summary at the end
         private bool AddFile(KeyValuePair<string, string> paths, Action<BSP>? onExcluded = null, BSP? bsp = null)
         {
-            var externalPath = paths.Value;
+            string? externalPath = paths.Value;
 
             // exclude files that are excluded
             if (externalPath != "" && File.Exists(externalPath)
@@ -166,7 +166,7 @@ namespace CompilePalX.Compilers.BSPPack
 
 			// add all manually included files
 			// TODO right now the manually included files search for files it depends on. Not sure if this should be default behavior
-	        foreach (var file in includeFiles)
+	        foreach (string? file in includeFiles)
 	        {
 				// try to get the source directory the file is located in
 				FileInfo fileInfo = new FileInfo(file);
@@ -174,9 +174,9 @@ namespace CompilePalX.Compilers.BSPPack
 				// default base directory is the game folder
 		        string baseDir = GameConfigurationManager.GameConfiguration.GameFolder;
 
-		        var potentialSubDir = new List<string>(sourceDirs); // clone to prevent accidental modification
+		        List<string>? potentialSubDir = new List<string>(sourceDirs); // clone to prevent accidental modification
 				potentialSubDir.Remove(baseDir);
-		        foreach (var folder in potentialSubDir)
+		        foreach (string? folder in potentialSubDir)
 		        {
 			        if (fileInfo.Directory != null 
 			            && fileInfo.Directory.FullName.ToLower().Contains(folder.ToLower()))
@@ -226,7 +226,7 @@ namespace CompilePalX.Compilers.BSPPack
 
         public void OutputToFile()
         {
-            var outputLines = new List<string>();
+            List<string>? outputLines = new List<string>();
 
             foreach (KeyValuePair<string, string> entry in Files)
             {
@@ -244,9 +244,9 @@ namespace CompilePalX.Compilers.BSPPack
 
         public Dictionary<string,string> GetResponseFile()
         {
-            var output = new Dictionary<string,string>();
+            Dictionary<string, string>? output = new Dictionary<string,string>();
 
-            foreach (var entry in Files)
+            foreach (KeyValuePair<string, string> entry in Files)
             {
                 output.Add(entry.Key, entry.Value.Replace(entry.Key, ""));
             }
@@ -301,7 +301,7 @@ namespace CompilePalX.Compilers.BSPPack
 	            foreach (string mat in mdlMatsAndModels.Item1)
 					AddTexture(mat);
 
-	            foreach (var model in mdlMatsAndModels.Item2)
+	            foreach (string? model in mdlMatsAndModels.Item2)
 					AddModel(model);
 
             }
@@ -356,7 +356,7 @@ namespace CompilePalX.Compilers.BSPPack
             // Attempts to find the file from the internalPath
             // returns the externalPath or an empty string
 
-	        var sanitizedPath = SanitizePath(internalPath);
+	        string? sanitizedPath = SanitizePath(internalPath);
 
 			foreach (string source in sourceDirs)
                 if (File.Exists(source +"/"+ sanitizedPath))

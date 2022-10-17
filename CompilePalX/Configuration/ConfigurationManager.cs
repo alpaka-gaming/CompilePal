@@ -72,31 +72,31 @@ namespace CompilePalX
 
             //collect new metadatas
 
-            var metadatas = Directory.GetDirectories(ParametersFolder);
+            string[]? metadatas = Directory.GetDirectories(ParametersFolder);
 
-            foreach (var metadata in metadatas)
+            foreach (string? metadata in metadatas)
             {
                 string folderName = Path.GetFileName(metadata);
 
                 if (CompileProcesses.Any(c => String.Equals(c.Metadata.Name, folderName, StringComparison.CurrentCultureIgnoreCase)))
                     continue;
 
-                var compileProcess = new CompileExecutable(folderName);
+                CompileExecutable? compileProcess = new CompileExecutable(folderName);
 
                 CompileProcesses.Add(compileProcess);
             }
 
             //collect legacy metadatas
-            var csvMetaDatas = Directory.GetFiles(ParametersFolder + "\\", "*.meta");
+            string[]? csvMetaDatas = Directory.GetFiles(ParametersFolder + "\\", "*.meta");
 
-            foreach (var metadata in csvMetaDatas)
+            foreach (string? metadata in csvMetaDatas)
             {
                 string name = Path.GetFileName(metadata).Replace(".meta", "");
 
                 if (CompileProcesses.Any(c => String.Equals(c.Metadata.Name, name, StringComparison.CurrentCultureIgnoreCase)))
                     continue;
 
-                var compileProcess = new CompileExecutable(name);
+                CompileExecutable? compileProcess = new CompileExecutable(name);
 
                 CompileProcesses.Add(compileProcess);
             }
@@ -114,12 +114,12 @@ namespace CompilePalX
                 Directory.CreateDirectory(PresetsFolder);
 
             //get a list of presets from the directories in the preset folder
-            var presets = Directory.GetDirectories(PresetsFolder);
+            string[]? presets = Directory.GetDirectories(PresetsFolder);
 
             //clear old lists
             KnownPresets.Clear();
 
-            foreach (var process in CompileProcesses)
+            foreach (CompileProcess? process in CompileProcesses)
             {
                 process.PresetDictionary.Clear();
             }
@@ -138,23 +138,23 @@ namespace CompilePalX
                     // legacy presets don't have metadata, use folder name as preset name
                     preset = new Preset() { Name = presetName };
 
-                foreach (var process in CompileProcesses)
+                foreach (CompileProcess? process in CompileProcesses)
                 {
                     string file = Path.Combine(presetPath, process.PresetFile);
                     if (File.Exists(file))
                     {
                         process.PresetDictionary.Add(preset, new ObservableCollection<ConfigItem>());
                         //read the list of preset parameters
-                        var lines = File.ReadAllLines(file);
+                        string[]? lines = File.ReadAllLines(file);
 
-                        foreach (var line in lines)
+                        foreach (string? line in lines)
                         {
-	                        var item = ParsePresetLine(line);
+	                        ConfigItem? item = ParsePresetLine(line);
 
                             if (process.ParameterList.Any(c => c.Parameter == item.Parameter))
                             {
                                 //remove .clone if you are a masochist and wish to enter the object oriented version of hell
-                                var equivalentItem = (ConfigItem)process.ParameterList.FirstOrDefault(c => c.Parameter == item.Parameter).Clone();
+                                ConfigItem? equivalentItem = (ConfigItem)process.ParameterList.FirstOrDefault(c => c.Parameter == item.Parameter).Clone();
 
                                 equivalentItem.Value = item.Value;
 
@@ -182,16 +182,16 @@ namespace CompilePalX
 
         public static void SavePresets()
         {
-            foreach (var knownPreset in KnownPresets)
+            foreach (Preset? knownPreset in KnownPresets)
             {
                 string presetFolder =  GetPresetFolder(knownPreset);
 
-                foreach (var compileProcess in CompileProcesses)
+                foreach (CompileProcess? compileProcess in CompileProcesses)
                 {
                     if (compileProcess.PresetDictionary.ContainsKey(knownPreset))
                     {
-                        var lines = new List<string>();
-                        foreach (var item in compileProcess.PresetDictionary[knownPreset])
+                        List<string>? lines = new List<string>();
+                        foreach (ConfigItem? item in compileProcess.PresetDictionary[knownPreset])
                         {
                             string line = WritePresetLine(item);
                             lines.Add(line);
@@ -213,7 +213,7 @@ namespace CompilePalX
 
         public static void SaveProcesses()
         {
-            foreach (var process in CompileProcesses)
+            foreach (CompileProcess? process in CompileProcesses)
             {
                 string jsonMetadata = Path.Combine("./Parameters", process.Metadata.Name, "meta.json");
 
@@ -224,7 +224,7 @@ namespace CompilePalX
         public static Preset NewPreset(string name, string? map)
         {
             string[] defaultProcesses = new string[] { "VBSP", "VVIS", "VRAD", "COPY", "GAME" };
-            var preset = new Preset() { Name = name, Map = map };
+            Preset? preset = new Preset() { Name = name, Map = map };
 
             // if map specific, append map to name so you can make map specific presets with the same name as global ones
             string folder = GetPresetFolder(preset);
@@ -233,7 +233,7 @@ namespace CompilePalX
             {
                 Directory.CreateDirectory(folder);
 
-                foreach (var process in CompileProcesses)
+                foreach (CompileProcess? process in CompileProcesses)
                 {
                     if (defaultProcesses.Contains(process.Metadata.Name))
                     {
@@ -256,7 +256,7 @@ namespace CompilePalX
             if (CurrentPreset == null)
                 return null;
 
-            var preset = new Preset() { Name = name, Map = map };
+            Preset? preset = new Preset() { Name = name, Map = map };
 
             // if map specific, append map to name so you can make map specific presets with the same name as global ones
             string newFolder = GetPresetFolder(preset);
@@ -311,14 +311,14 @@ namespace CompilePalX
 
         public static ObservableCollection<ConfigItem> GetParameters(string processName, bool doRun = false)
         {
-            var list = new ObservableCollection<ConfigItem>();
+            ObservableCollection<ConfigItem>? list = new ObservableCollection<ConfigItem>();
 
             string jsonParameters = Path.Combine(ParametersFolder, processName, "parameters.json");
 
             if (File.Exists(jsonParameters))
             {
                 ConfigItem[] items = JsonConvert.DeserializeObject<ConfigItem[]>(File.ReadAllText(jsonParameters));
-                foreach (var configItem in items)
+                foreach (ConfigItem? configItem in items)
                 {
                     list.Add(configItem);
                 }
@@ -341,13 +341,13 @@ namespace CompilePalX
 
                 if (File.Exists(csvParameters))
                 {
-                    var baselines = File.ReadAllLines(csvParameters);
+                    string[]? baselines = File.ReadAllLines(csvParameters);
 
                     for (int i = 2; i < baselines.Length; i++)
                     {
                         string baseline = baselines[i];
 
-                        var item = ParseBaseLine(baseline);
+                        ConfigItem? item = ParseBaseLine(baseline);
 
                         list.Add(item);
                     }
@@ -368,9 +368,9 @@ namespace CompilePalX
 
         private static ConfigItem ParsePresetLine(string line)
         {
-            var item = new ConfigItem();
+            ConfigItem? item = new ConfigItem();
 
-            var pieces = line.Split(',');
+            string[]? pieces = line.Split(',');
 
             if (pieces.Any())
             {
@@ -407,9 +407,9 @@ namespace CompilePalX
 
         private static ConfigItem ParseBaseLine(string line)
         {
-            var item = new ConfigItem();
+            ConfigItem? item = new ConfigItem();
 
-            var pieces = line.Split(';');
+            string[]? pieces = line.Split(';');
 
             if (pieces.Any())
             {

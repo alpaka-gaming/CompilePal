@@ -50,7 +50,7 @@ namespace CompilePalX.Compilers
                     throw new FileNotFoundException();
                 }
 
-                var addtionalParameters = Regex.Replace(GetParameterString(), "\b-hidd3en\b", "");
+                string? addtionalParameters = Regex.Replace(GetParameterString(), "\b-hidd3en\b", "");
                 hidden = GetParameterString().Contains("-hidden");
                 FetchHDRLevels();
 
@@ -98,7 +98,7 @@ namespace CompilePalX.Compilers
 
         public void RunCubemaps(string gameEXE, string args, CancellationToken cancellationToken)
         {
-            var startInfo = new ProcessStartInfo(gameEXE, args);
+            ProcessStartInfo? startInfo = new ProcessStartInfo(gameEXE, args);
             startInfo.UseShellExecute = false;
             startInfo.CreateNoWindow = false;
 
@@ -110,7 +110,7 @@ namespace CompilePalX.Compilers
         public void FetchHDRLevels()
         {
             CompilePalLogger.LogLine("Detecting HDR levels...");
-            var startInfo = new ProcessStartInfo(vbspInfo, "\"" + bspFile + "\"")
+            ProcessStartInfo? startInfo = new ProcessStartInfo(vbspInfo, "\"" + bspFile + "\"")
             {
                 UseShellExecute = false,
                 CreateNoWindow = true,

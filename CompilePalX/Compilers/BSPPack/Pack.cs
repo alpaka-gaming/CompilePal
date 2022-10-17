@@ -94,7 +94,7 @@ namespace CompilePalX.Compilers.BSPPack
                 // manually passing in a file list
                 if (usefilelist)
                 {
-                    var fileListParam = parameters.First(p => p.StartsWith("usefilelist"))
+                    string[]? fileListParam = parameters.First(p => p.StartsWith("usefilelist"))
                         .Split(new[] { " " }, 2, StringSplitOptions.None);
                     if (fileListParam.Length > 1 && !string.IsNullOrWhiteSpace(fileListParam[1]))
                     {
@@ -137,7 +137,7 @@ namespace CompilePalX.Compilers.BSPPack
                     {
                         if (parameter.Contains("include"))
                         {
-                            var filePath = parameter.Replace("\"", "").Replace("include ", "").TrimEnd(' ');
+                            string? filePath = parameter.Replace("\"", "").Replace("include ", "").TrimEnd(' ');
                             //Test that file exists
                             if (File.Exists(filePath))
                                 includeFiles.Add(filePath);
@@ -157,12 +157,12 @@ namespace CompilePalX.Compilers.BSPPack
                     {
                         if (parameter.Contains("includedir"))
                         {
-                            var folderPath = parameter.Replace("\"", "").Replace("includedir ", "").TrimEnd(' ');
+                            string? folderPath = parameter.Replace("\"", "").Replace("includedir ", "").TrimEnd(' ');
                             //Test that folder exists
                             if (Directory.Exists(folderPath))
                             {
-                                var files = Directory.GetFiles(folderPath, "*", SearchOption.AllDirectories);
-                                foreach (var file in files)
+                                string[]? files = Directory.GetFiles(folderPath, "*", SearchOption.AllDirectories);
+                                foreach (string? file in files)
                                     includeFiles.Add(file);
                             }
                             else
@@ -179,7 +179,7 @@ namespace CompilePalX.Compilers.BSPPack
                     {
                         if (Regex.IsMatch(parameter, @"^exclude\b"))
                         {
-                            var filePath = parameter.Replace("\"", "")
+                            string? filePath = parameter.Replace("\"", "")
                                 .Replace("exclude ", "")
                                 .Replace('/', '\\')
                                 .ToLower().TrimEnd(' ');
@@ -200,7 +200,7 @@ namespace CompilePalX.Compilers.BSPPack
                     {
                         if (Regex.IsMatch(parameter, @"^excludedir\b"))
                         {
-                            var path = parameter.Replace("\"", "")
+                            string? path = parameter.Replace("\"", "")
                                 .Replace("excludedir ", "")
                                 .Replace('/', '\\')
                                 .ToLower().TrimEnd(' ');
@@ -221,7 +221,7 @@ namespace CompilePalX.Compilers.BSPPack
                     {
                         if (parameter.Contains("excludevpk"))
                         {
-                            var vpkPath = parameter.Replace("\"", "").Replace("excludevpk ", "").TrimEnd(' ');
+                            string? vpkPath = parameter.Replace("\"", "").Replace("excludevpk ", "").TrimEnd(' ');
 
                             string[] vpkFileList = GetVPKFileList(vpkPath);
 
@@ -238,7 +238,7 @@ namespace CompilePalX.Compilers.BSPPack
                 if (verbose)
                 {
                     CompilePalLogger.LogLine("Source directories:");
-                    foreach (var sourceDirectory in sourceDirectories)
+                    foreach (string? sourceDirectory in sourceDirectories)
                         CompilePalLogger.LogLine(sourceDirectory);
                 }
 
@@ -268,9 +268,9 @@ namespace CompilePalX.Compilers.BSPPack
 
                 if (includefilelist)
                 {
-                    var fileListParams = parameters.Where(p => p.StartsWith("includefilelist"))
+                    IEnumerable<string[]>? fileListParams = parameters.Where(p => p.StartsWith("includefilelist"))
                         .Select(f => f.Split(new[] { " " }, 2, StringSplitOptions.None));
-                    foreach (var fileListParam in fileListParams)
+                    foreach (string[]? fileListParam in fileListParams)
                     {
                         if (fileListParam.Length <= 1 || string.IsNullOrWhiteSpace(fileListParam[1]))
                         {
@@ -279,7 +279,7 @@ namespace CompilePalX.Compilers.BSPPack
                             continue;
                         }
 
-                        var inputFile = fileListParam[1];
+                        string? inputFile = fileListParam[1];
                         if (!File.Exists(inputFile))
                         {
                             CompilePalLogger.LogCompileError($"Could not find file list {inputFile}\n",
@@ -288,13 +288,13 @@ namespace CompilePalX.Compilers.BSPPack
                         }
 
                         CompilePalLogger.LogDebug($"Adding files from file list {inputFile}");
-                        var filelist = File.ReadAllLines(inputFile);
+                        string[]? filelist = File.ReadAllLines(inputFile);
 
                         // file list format is internal path, newline, external path
                         for (int i = 0; i < filelist.Length - 1; i += 2)
                         {
-                            var internalPath = filelist[i];
-                            var externalPath = filelist[i + 1];
+                            string? internalPath = filelist[i];
+                            string? externalPath = filelist[i + 1];
                             if (!pakfile.AddInternalFile(internalPath, externalPath))
                             {
                                 CompilePalLogger.LogCompileError($"Failed to pack ${externalPath}\n",
@@ -314,7 +314,7 @@ namespace CompilePalX.Compilers.BSPPack
                         File.Delete(vpkName);
                     }
 
-                    var responseFile = pakfile.GetResponseFile();
+                    Dictionary<string, string>? responseFile = pakfile.GetResponseFile();
 
                     if (File.Exists(bspPath))
                     {
@@ -328,7 +328,7 @@ namespace CompilePalX.Compilers.BSPPack
                         {
                             if (parameter.Contains("ainfo"))
                             {
-                                var @filePath = parameter.Replace("\"", "").Replace("ainfo ", "").TrimEnd(' ');
+                                string? @filePath = parameter.Replace("\"", "").Replace("ainfo ", "").TrimEnd(' ');
                                 //Test that file exists
                                 if (File.Exists(filePath))
                                 {
@@ -344,10 +344,10 @@ namespace CompilePalX.Compilers.BSPPack
                         return;
 
                     CompilePalLogger.LogLine("Running VPK...");
-                    foreach (var path in sourceDirectories)
+                    foreach (string? path in sourceDirectories)
                     {
-                        var testedFiles = "";
-                        foreach (var entry in responseFile)
+                        string? testedFiles = "";
+                        foreach (KeyValuePair<string, string> entry in responseFile)
                         {
                             if (entry.Value.Contains(path) || path.Contains(entry.Value))
                             {
@@ -355,7 +355,7 @@ namespace CompilePalX.Compilers.BSPPack
                             }
                         }
 
-                        var combinedPath = Path.Combine(path, "_tempResponseFile.txt");
+                        string? combinedPath = Path.Combine(path, "_tempResponseFile.txt");
                         File.WriteAllText(combinedPath, testedFiles);
 
                         PackVPK(vpkName, combinedPath, path);
@@ -483,13 +483,13 @@ namespace CompilePalX.Compilers.BSPPack
             arguments = arguments.Replace("$bspold", bspPath);
             arguments = arguments.Replace("$dir", unpackDir);
 
-            var startInfo = new ProcessStartInfo(bspZip, arguments);
+            ProcessStartInfo? startInfo = new ProcessStartInfo(bspZip, arguments);
             startInfo.UseShellExecute = false;
             startInfo.CreateNoWindow = true;
             startInfo.RedirectStandardOutput = true;
             startInfo.EnvironmentVariables["VPROJECT"] = gameFolder;
 
-            var p = new Process { StartInfo = startInfo };
+            Process? p = new Process { StartInfo = startInfo };
             p.Start();
             string output = p.StandardOutput.ReadToEnd();
 
@@ -504,7 +504,7 @@ namespace CompilePalX.Compilers.BSPPack
             arguments = arguments.Replace("$bspold", bspPath);
             arguments = arguments.Replace("$list", outputFile);
 
-            var startInfo = new ProcessStartInfo(bspZip, arguments)
+            ProcessStartInfo? startInfo = new ProcessStartInfo(bspZip, arguments)
             {
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
@@ -515,7 +515,7 @@ namespace CompilePalX.Compilers.BSPPack
                 }
             };
 
-            var p = new Process { StartInfo = startInfo };
+            Process? p = new Process { StartInfo = startInfo };
 
             try
             {
@@ -549,7 +549,7 @@ namespace CompilePalX.Compilers.BSPPack
         {
             string arguments = $"a \"{targetVPK}\" \"@{responseFile}\"";
 
-            var p = new Process
+            Process? p = new Process
             {
                 StartInfo = new ProcessStartInfo
 
@@ -594,7 +594,7 @@ namespace CompilePalX.Compilers.BSPPack
 		{
             string arguments = $"l \"{VPKPath}\"";
 
-            var p = new Process
+            Process? p = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
@@ -637,12 +637,12 @@ namespace CompilePalX.Compilers.BSPPack
 
             if (File.Exists(gameInfo))
             {
-                var lines = File.ReadAllLines(gameInfo);
+                string[]? lines = File.ReadAllLines(gameInfo);
 
                 bool foundSearchPaths = false;
                 for (int i = 0; i < lines.Length; i++)
                 {
-                    var line = lines[i];
+                    string? line = lines[i];
 
                     if (foundSearchPaths)
                     {
@@ -681,7 +681,7 @@ namespace CompilePalX.Compilers.BSPPack
 
 	                        try
 	                        {
-		                        var directories = Directory.GetDirectories(fullPath);
+		                        string[]? directories = Directory.GetDirectories(fullPath);
 		                        sourceDirectories.AddRange(directories);
 	                        }
                             catch
@@ -760,7 +760,7 @@ namespace CompilePalX.Compilers.BSPPack
             bool inQuote = false;
             StringBuilder tempParam = new StringBuilder();
 
-            foreach (var pChar in paramChars)
+            foreach (char pChar in paramChars)
             {
                 if (pChar == '\"')
                     inQuote = !inQuote;

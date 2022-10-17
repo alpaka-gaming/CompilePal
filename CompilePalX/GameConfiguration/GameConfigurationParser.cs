@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using CompilePalX.Compiling;
+using CompilePalX.KV;
 
 namespace CompilePalX {
     class GameConfigurationParser
@@ -14,9 +15,9 @@ namespace CompilePalX {
             if (!File.Exists(filename))
                 filename = Path.Combine(binFolder, "GameConfig.txt");
 
-            var gameInfos = new List<GameConfiguration>();
+            List<GameConfiguration>? gameInfos = new List<GameConfiguration>();
 
-            var data = new KV.FileData(filename);
+            FileData? data = new KV.FileData(filename);
             foreach (KV.DataBlock gamedb in data.headnode.GetFirstByName(new[] { "\"Configs\"", "\"GameConfig.txt\"", "\"hammerplusplus\\hammerplusplus_gameconfig.txt\"" })
                          .GetFirstByName("\"Games\"").subBlocks)
             {
@@ -60,7 +61,7 @@ namespace CompilePalX {
         {
             if (!File.Exists(config.GameInfoPath)) return null;
 
-            foreach (var line in File.ReadLines(config.GameInfoPath))
+            foreach (string? line in File.ReadLines(config.GameInfoPath))
             {
                 // ignore commented out lines
                 if (line.TrimStart().StartsWith("//") || string.IsNullOrWhiteSpace(line))
@@ -69,7 +70,7 @@ namespace CompilePalX {
                 if (!line.Contains("SteamAppId")) continue;
 
                 // sometimes gameinfo contains tabs, replace with spaces and filter them out
-                var splitLine = line.Replace('\t', ' ').Split(' ').Where(c => c != String.Empty).ToList();
+                List<string>? splitLine = line.Replace('\t', ' ').Split(' ').Where(c => c != String.Empty).ToList();
 
                 // bad format
                 if (splitLine.Count < 2)

@@ -20,7 +20,7 @@ namespace CompilePalX.Compilers
 		public List<CustomProgram> BuildProgramList()
 		{
 			Programs = new List<CustomProgram>();
-			foreach (var parameter in PresetDictionary[ConfigurationManager.CurrentPreset])
+			foreach (ConfigItem? parameter in PresetDictionary[ConfigurationManager.CurrentPreset])
 			{
 				string path = parameter.Value;
 				string args = parameter.Value2;

@@ -17,8 +17,8 @@ namespace CompilePalX.Compiling
             ErrorBrowser.Navigating += ErrorBrowser_Navigating;
 
             // extract values from error message using regex and insert them into the template  
-            var html = error.Message;
-            var i = 0;
+            string? html = error.Message;
+            int i = 0;
             foreach (Group group in Regex.Match(error.ShortDescription, error.RegexTrigger.ToString()).Groups)
             {
                 // first group is always the entire match, ignore it
@@ -53,7 +53,7 @@ namespace CompilePalX.Compiling
             if (url.StartsWith("about:tutorials"))
                 url = url.Replace("about:forum", "http://www.interlopers.net/tutorials");
 
-            var startInfo = new ProcessStartInfo
+            ProcessStartInfo? startInfo = new ProcessStartInfo
             {
                 FileName = url
             };

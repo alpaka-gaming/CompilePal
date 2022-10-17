@@ -59,13 +59,13 @@ namespace CompilePalX
 
 		private static void RowDragOnMouseMove(object sender, MouseEventArgs mouseEventArgs)
 		{
-			var draggedRow = RowDragHelper.GetDraggedItem(sender as DependencyObject);
+			object? draggedRow = RowDragHelper.GetDraggedItem(sender as DependencyObject);
 			DataGrid g = sender as DataGrid;
 
 			if (draggedRow == null || g == null)
 				return;
 
-			var targetRow = GetRowFromPoint(g, mouseEventArgs.GetPosition(g));
+			DataGridRow? targetRow = GetRowFromPoint(g, mouseEventArgs.GetPosition(g));
 
 			if (targetRow == null)
 				return;
@@ -75,7 +75,7 @@ namespace CompilePalX
 
 		private static void RowDragOnPreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs mouseButtonEventArgs)
 		{
-			var draggedItem = RowDragHelper.GetDraggedItem(sender as DependencyObject);
+			object? draggedItem = RowDragHelper.GetDraggedItem(sender as DependencyObject);
 			if (draggedItem == null) return;
 
 			//disabled because it seems to glitch out when 2 custom programs are swapped
@@ -101,7 +101,7 @@ namespace CompilePalX
 				return;
 
 			//Prevent user from reordering processes not marked as orderable
-			var isDraggable = (selectedRow.Item as CompileProcess)?.IsDraggable;
+			bool? isDraggable = (selectedRow.Item as CompileProcess)?.IsDraggable;
 			if (isDraggable != null && !(bool) isDraggable)
 				return;
 
@@ -110,7 +110,7 @@ namespace CompilePalX
 
 		private static T FindVisualParent<T>(DependencyObject child) where T : DependencyObject
 		{
-			var parentObject = VisualTreeHelper.GetParent(child);
+			DependencyObject? parentObject = VisualTreeHelper.GetParent(child);
 
 			if (parentObject == null)
 				return null;
@@ -142,20 +142,20 @@ namespace CompilePalX
 
 		private static void ExchangeRows(object sender, object target)
 		{
-			var draggedRow = RowDragHelper.GetDraggedItem(sender as DependencyObject);
+			object? draggedRow = RowDragHelper.GetDraggedItem(sender as DependencyObject);
 
 			if (draggedRow == null)
 				return;
 
 			if (target != null && !ReferenceEquals(draggedRow, target))
 			{
-				var list = ((DataGrid) sender).ItemsSource as IList;
+				IList? list = ((DataGrid) sender).ItemsSource as IList;
 				if (list == null)
 					return;
 
 				int oldIndex = list.IndexOf(draggedRow);
 
-				var targetIndex = list.IndexOf(target);
+				int targetIndex = list.IndexOf(target);
 				list.Remove(draggedRow);
 				list.Insert(targetIndex, draggedRow);
 

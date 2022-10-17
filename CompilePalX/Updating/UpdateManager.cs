@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
+using System.Threading.Tasks;
 using CompilePalX.Compiling;
 
 namespace CompilePalX
@@ -63,8 +64,8 @@ namespace CompilePalX
                 CompilePalLogger.LogLine("Fetching update information...");
 
                 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-                var c = new HttpClient();
-                var version = c.GetStringAsync(new Uri(isPrerelease ? LatestPrereleaseVersionURL : LatestVersionURL));
+                HttpClient? c = new HttpClient();
+                Task<string>? version = c.GetStringAsync(new Uri(isPrerelease ? LatestPrereleaseVersionURL : LatestVersionURL));
                 string newVersion = GetValidVersionString(await version);
 
                 latestVersion = Version.Parse(newVersion);

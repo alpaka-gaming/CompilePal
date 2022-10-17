@@ -144,7 +144,7 @@ namespace CompilePalX
             {
                 ProgressManager.SetProgress(0);
 
-                var mapErrors = new List<MapErrors>();
+                List<MapErrors>? mapErrors = new List<MapErrors>();
 
 
                 foreach (Map map in MapFiles)
@@ -159,7 +159,7 @@ namespace CompilePalX
                     string cleanMapName = Path.GetFileNameWithoutExtension(mapFile);
                     ConfigurationManager.CurrentPreset = map.Preset;
 
-                    var compileErrors = new List<Error>();
+                    List<Error>? compileErrors = new List<Error>();
                     CompilePalLogger.LogLine($"Starting a '{ConfigurationManager.CurrentPreset?.Name}' compile.");
                     CompilePalLogger.LogLine($"Starting compilation of {cleanMapName}");
 
@@ -167,7 +167,7 @@ namespace CompilePalX
 	                OrderManager.UpdateOrder();
 
                     GameConfigurationManager.BackupCurrentContext();
-					foreach (var compileProcess in OrderManager.CurrentOrder)
+					foreach (CompileProcess? compileProcess in OrderManager.CurrentOrder)
 					{
                         cancellationToken.ThrowIfCancellationRequested();
                         currentCompileProcess = compileProcess;
@@ -211,7 +211,7 @@ namespace CompilePalX
                 int maxSeverity = errors.Max(e => e.Errors.Any() ? e.Errors.Max(e2 => e2.Severity) : 0);
                 CompilePalLogger.LogLineColor("{0} errors/warnings logged:", Error.GetSeverityBrush(maxSeverity), numErrors);
 
-                foreach (var map in errors)
+                foreach (MapErrors? map in errors)
                 {
                     CompilePalLogger.Log("  ");
 
@@ -224,10 +224,10 @@ namespace CompilePalX
                     int mapMaxSeverity = map.Errors.Max(e => e.Severity);
                     CompilePalLogger.LogLineColor("{0} errors/warnings logged for {1}:", Error.GetSeverityBrush(mapMaxSeverity), map.Errors.Count, map.MapName);
 
-                    var distinctErrors = map.Errors.GroupBy(e => e.ID).OrderBy(e => e.First().Severity);
-                    foreach (var errorList in distinctErrors)
+                    IOrderedEnumerable<IGrouping<int, Error>>? distinctErrors = map.Errors.GroupBy(e => e.ID).OrderBy(e => e.First().Severity);
+                    foreach (IGrouping<int, Error>? errorList in distinctErrors)
                     {
-                        var error = errorList.First();
+                        Error? error = errorList.First();
 
                         string errorText = $"{errorList.Count()}x: {error.SeverityText}: {error.ShortDescription}";
 

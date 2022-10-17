@@ -61,7 +61,7 @@ namespace CompilePalX
         {
             CompileMetadata metadata = new CompileMetadata();
 
-            var lines = File.ReadAllLines(csvFile);
+            string[]? lines = File.ReadAllLines(csvFile);
 
             metadata.Name = lines[0];
             metadata.Path = lines[1];
@@ -146,7 +146,7 @@ namespace CompilePalX
             string parameters = Metadata.Arguments;
 
             if (ConfigurationManager.CurrentPreset != null)
-                foreach (var parameter in PresetDictionary[ConfigurationManager.CurrentPreset])
+                foreach (ConfigItem? parameter in PresetDictionary[ConfigurationManager.CurrentPreset])
                 {
                     parameters += parameter.Parameter;
 

@@ -33,7 +33,7 @@ namespace CompilePalX
                 File.WriteAllText(Path.Combine("CrashLogs", crashLogName + ".txt"), e.ToString() + e.InnerException ?? "");
 				
 				ProgressManager.ErrorProgress();
-				var modalDialogSettings = new MetroDialogSettings
+				MetroDialogSettings modalDialogSettings = new MetroDialogSettings
 				{
 					AffirmativeButtonText = "Exit",
 					ColorScheme = MetroDialogColorScheme.Theme

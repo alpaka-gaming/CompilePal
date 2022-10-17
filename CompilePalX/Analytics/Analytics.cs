@@ -43,8 +43,8 @@ namespace CompilePalX
             try
             {
                 ManagementClass mc = new ManagementClass("win32_processor");
-                var cpus = mc.GetInstances();
-                foreach (var cpu in cpus)//Just for all those people with two cpus
+                ManagementObjectCollection cpus = mc.GetInstances();
+                foreach (ManagementBaseObject? cpu in cpus)//Just for all those people with two cpus
                     id += cpu.Properties["processorID"].Value.ToString();
             }
             catch
@@ -73,7 +73,7 @@ namespace CompilePalX
 
         public static string GetHashString(string inputString)
         {
-            var sb = new StringBuilder();
+            StringBuilder sb = new StringBuilder();
             foreach (byte b in GetHash(inputString))
                 sb.Append(b.ToString("X2"));
 

@@ -142,7 +142,7 @@ namespace CompilePalX.Compilers.BSPPack
 
 					string rawent = Encoding.ASCII.GetString(ents.ToArray());
                     Dictionary<string, string> entity = new Dictionary<string, string>();
-                    var entityArrayFormat = new List<Tuple<string, string>>();
+                    List<Tuple<string, string>>? entityArrayFormat = new List<Tuple<string, string>>();
 					// split on \n, ignore \n inside of quotes
                     foreach (string s in Regex.Split(rawent, "(?=(?:(?:[^\"]*\"){2})*[^\"]*$)\\n"))
                     {
@@ -248,10 +248,10 @@ namespace CompilePalX.Compilers.BSPPack
 	            {
 		            if (ent.ContainsKey("directory"))
 		            {
-			            var directory = $"{GameConfigurationManager.GameConfiguration.GameFolder}/materials/vgui/{ent["directory"]}";
+			            string? directory = $"{GameConfigurationManager.GameConfiguration.GameFolder}/materials/vgui/{ent["directory"]}";
 			            if (Directory.Exists(directory))
 			            {
-				            foreach (var file in Directory.GetFiles(directory))
+				            foreach (string? file in Directory.GetFiles(directory))
 				            {
 					            if (file.EndsWith(".vmt"))
 					            {
@@ -276,14 +276,14 @@ namespace CompilePalX.Compilers.BSPPack
             }
 
             // get all overlay mats
-            var uniqueMats = new HashSet<string>();
-            foreach (var ent in entityListArrayForm)
+            HashSet<string>? uniqueMats = new HashSet<string>();
+            foreach (List<Tuple<string, string>>? ent in entityListArrayForm)
             {
-                foreach(var prop in ent)
+                foreach(Tuple<string, string>? prop in ent)
                 {
                     // get i/o triggered materials
                     string ioString = GetIOString(prop.Item2);
-                    var match = Regex.Match(ioString, @"r_screenoverlay ([^,]+),");
+                    Match? match = Regex.Match(ioString, @"r_screenoverlay ([^,]+),");
                     if (match.Success)
                     {
                         uniqueMats.Add(match.Groups[1].Value.Replace(".vmt", ""));
@@ -291,9 +291,9 @@ namespace CompilePalX.Compilers.BSPPack
                 }
             }
 
-            foreach(var mat in uniqueMats)
+            foreach(string? mat in uniqueMats)
             {
-                var path = string.Format("materials/{0}.vmt", mat);
+                string? path = string.Format("materials/{0}.vmt", mat);
                 EntTextureList.Add(path);
             }
         }
@@ -430,9 +430,9 @@ namespace CompilePalX.Compilers.BSPPack
 					{
 						List<string> io = ioString.Split(',').ToList();
 
-						var playCommand = io.Where(i => i.StartsWith("play "));
+						IEnumerable<string>? playCommand = io.Where(i => i.StartsWith("play "));
 
-						foreach (var command in playCommand)
+						foreach (string? command in playCommand)
 						{
 							EntSoundList.Add("sound/" + command.Split(' ')[1].Trim(SpecialCaracters));
 						}
@@ -461,7 +461,7 @@ namespace CompilePalX.Compilers.BSPPack
             // only need to convert complex form into simple form
             if (property.Contains(':'))
             {
-                var splitIo = property.Split(':');
+                string[]? splitIo = property.Split(':');
                 if (splitIo.Length < 3)
                 {
                     CompilePalLogger.LogCompileError($"Failed to decode AddOutput, format may be incorrect: {property}\n", new Error($"Failed to decode AddOutput, format may be incorrect: {property}\n", ErrorSeverity.Warning));

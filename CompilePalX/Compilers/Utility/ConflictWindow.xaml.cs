@@ -176,7 +176,7 @@ namespace CompilePalX.Compilers.UtilityProcess
             if (fileBox.SelectedItems.Count == 0)
                 return;
 
-            foreach (var selectedItem in fileBox.SelectedItems)
+            foreach (object? selectedItem in fileBox.SelectedItems)
             {
                 string itemPath = selectedItem as string;
                 selectedPCFS.Add(pcfDict[itemPath]);

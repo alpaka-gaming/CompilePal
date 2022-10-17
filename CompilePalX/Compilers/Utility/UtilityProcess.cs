@@ -81,7 +81,7 @@ namespace CompilePalX.Compilers.UtilityProcess
                     {
                         if (parameter.Contains("excludedir"))
                         {
-                            var @dirPath = parameter.Replace("\"", "").Replace("excludedir ", "").TrimEnd(' ');
+                            string? @dirPath = parameter.Replace("\"", "").Replace("excludedir ", "").TrimEnd(' ');
                             //Test that directory exists
                             if (Directory.Exists(dirPath))
                                 excludedDirectories.Add(dirPath);
@@ -102,7 +102,7 @@ namespace CompilePalX.Compilers.UtilityProcess
                     {
                         if (parameter.Contains("excludefile"))
                         {
-                            var @filePath = parameter.Replace("\"", "").Replace("excludefile ", "").Replace('/', '\\')
+                            string? @filePath = parameter.Replace("\"", "").Replace("excludefile ", "").Replace('/', '\\')
                                 .ToLower().TrimEnd(' ');
                             //Test that file exists
                             if (File.Exists(filePath))
@@ -439,7 +439,7 @@ namespace CompilePalX.Compilers.UtilityProcess
 			bool inQuote = false;
 			StringBuilder tempParam = new StringBuilder();
 
-			foreach (var pChar in paramChars)
+			foreach (char pChar in paramChars)
 			{
 				if (pChar == '\"')
 					inQuote = !inQuote;
