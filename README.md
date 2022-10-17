@@ -10,7 +10,6 @@
 
 ![ui](https://i.imgur.com/DvAVPeR.png)
 
-
 ## Downloads
 
 #### Latest Release
@@ -18,12 +17,13 @@
 [Compile Pal V27](https://github.com/ruarai/CompilePal/releases/latest)
 
 #### Experimental Releases
+
 Get the latest features without having to wait. Experimental releases may be unstable, use at your own risk.
 
 [Compile Pal V27.31](https://github.com/ruarai/CompilePal/releases/tag/v027.31)
 
-
 ## Features
+
 * Packing
 * Error Checking
 * Not freezing your computer while compiling
@@ -35,6 +35,7 @@ Get the latest features without having to wait. Experimental releases may be uns
 * Much More!
 
 ## Guides
+
 * [Quick Start](Guides/QuickStart.md)
 * [Reporting An Issue](Guides/Issues.md)
 * [Plugin Development](Guides/Plugins.md)
@@ -48,14 +49,15 @@ Get the latest features without having to wait. Experimental releases may be uns
 New features or bugfixes are always welcome. Feel free to create a pull request. We also make good use of any issues [reported to us](https://github.com/ruarai/CompilePal/issues).
 
 ### Developers
+
 - [ruarai](https://github.com/ruarai)
 - [maxdup](https://github.com/maxdup)
 - [Exactol](https://github.com/Exactol)
 - iMilo
 
-
 ### Bug Testing
+
 - wareya
-- Gangleider 
-- Matt2468rv 
+- Gangleider
+- Matt2468rv
 - Sevin7 
