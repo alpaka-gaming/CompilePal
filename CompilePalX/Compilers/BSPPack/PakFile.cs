@@ -21,6 +21,10 @@ namespace CompilePalX.Compilers.BSPPack
 
         private bool AddFile(string internalPath, string externalPath)
         {
+            if (externalPath.Length > 256)
+            {
+                CompilePalLogger.LogCompileError($"File length over 256 characters, file may not pack properly:\n{externalPath}", new Error($"File length over 256 characters, file may not pack properly", ErrorSeverity.Warning));
+            }
             return AddFile(new KeyValuePair<string, string>(internalPath, externalPath));
         }
         // onFailure is for utility files such as nav, radar, etc which get excluded. if they are excluded, the Delegate is run. This is used for removing the files from the BSP class, so they dont appear in the summary at the end
@@ -60,11 +64,11 @@ namespace CompilePalX.Compilers.BSPPack
         public int vehiclescriptcount { get; private set; }
         public int effectscriptcount { get; private set; }
         public int vscriptcount { get; private set; }
-        public int panoramaMapIconCount { get; private set; }
+        public int PanoramaMapBackgroundCount { get; private set; }
 
         public PakFile(BSP bsp, List<string> sourceDirectories, List<string> includeFiles, List<string> excludedFiles, List<string> excludedDirs, List<string> excludedVpkFiles, string outputFile)
         {
-            mdlcount = vmtcount = pcfcount = sndcount = vehiclescriptcount = effectscriptcount = panoramaMapIconCount = 0;
+            mdlcount = vmtcount = pcfcount = sndcount = vehiclescriptcount = effectscriptcount = PanoramaMapBackgroundCount = 0;
             sourceDirs = sourceDirectories;
             fileName = outputFile;
 
@@ -94,6 +98,11 @@ namespace CompilePalX.Compilers.BSPPack
 
             if (bsp.RadarTablet.Key != default(string))
                 AddFile(bsp.RadarTablet, (b => b.RadarTablet = default), bsp);
+
+            if (bsp.PanoramaMapIcon.Key != default(string))
+            {
+                AddFile(bsp.PanoramaMapIcon, (b => b.PanoramaMapIcon = default), bsp);
+            }
 
             if (bsp.res.Key != default(string))
             {
@@ -160,11 +169,12 @@ namespace CompilePalX.Compilers.BSPPack
                 if (AddInternalFile(sound, FindExternalFile(sound)))
                     sndcount++;
             foreach (string vscript in bsp.vscriptList)
-                if (AddInternalFile(vscript, FindExternalFile(vscript)))
-                    vscriptcount++;
-            foreach (KeyValuePair<string, string> teamSelectionBackground in bsp.PanoramaMapIcons)
+            {
+                AddVScript(vscript);
+            }
+            foreach (KeyValuePair<string, string> teamSelectionBackground in bsp.PanoramaMapBackgrounds)
                 if (AddInternalFile(teamSelectionBackground.Key, teamSelectionBackground.Value))
-                    panoramaMapIconCount++;
+                    PanoramaMapBackgroundCount++;
 
 			// add all manually included files
 			// TODO right now the manually included files search for files it depends on. Not sure if this should be default behavior
@@ -351,6 +361,31 @@ namespace CompilePalX.Compilers.BSPPack
 				CompilePalLogger.LogCompileError($"Failed to find particle manifest file {internalPath}", new Error($"Failed to find particle manifest file {internalPath}", ErrorSeverity.Error));
 				return;
             }
+        }
+
+        /// <summary>
+        /// Adds VScript file and finds it's dependencies
+        /// </summary>
+        /// <param name="internalPath"></param>
+        public void AddVScript(string internalPath)
+        {
+            string externalPath = FindExternalFile(internalPath);
+
+            // referenced scripts don't always have extension, try adding .nut
+            if (externalPath == string.Empty)
+            {
+                externalPath = FindExternalFile($"{internalPath}.nut");
+            }
+
+            if (!AddInternalFile(internalPath, externalPath))
+            {
+				CompilePalLogger.LogCompileError($"Failed to find VScript file {internalPath}\n", new Error($"Failed to find VScript file", ErrorSeverity.Error));
+                return;
+            }
+            vscriptcount++;
+
+            foreach (string vscript in AssetUtils.FindVSCriptRefs(externalPath))
+                AddVScript(vscript);
         }
 
         private string FindExternalFile(string internalPath)

@@ -7,11 +7,12 @@
   "Description": "BSPzip.exe's BSP Compression.",
   "Warning": "",
   "PresetDefault": false,
-  "BasisString": " -repack -compress $mapCopyLocation$",
+  "BasisString": " -game $game$ -repack -compress $mapCopyLocation$",
   "SupportsBSP": true,
   "CompatibleGames": [
     440, // tf2
-    240 // cs:s
+    240, // cs:s
+    669270 // momentum mod
   ],
   "CheckExitCode": false 
 }

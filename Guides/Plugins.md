@@ -1,7 +1,9 @@
-# Plugins
+# Plugins (Beta)
 Compile Pal's plugin based architecture allows developers to create their own compile steps.
 
-![image](https://user-images.githubusercontent.com/15372675/183811926-d23c8b65-4df1-4cb8-8474-93d63bd1fd56.png)
+Plugins are currently in a beta state, so the format and structure are subject to change.
+
+![image](https://user-images.githubusercontent.com/15372675/218288001-2154a3fa-201c-4f18-ad0f-36959aed9108.png)
 
 ## Installation
 Plugins can be installed by copying the plugin folder into the Compile Pal/Parameters folder.
@@ -9,7 +11,7 @@ Plugins can be installed by copying the plugin folder into the Compile Pal/Param
 ***USE PLUGINS AT YOUR OWN RISK, DO NOT INSTALL PLUGINS FROM UNTRUSTED SOURCES***
 
 ## Structure
-Plugins consist of a folder that contains a `meta.json` and `parameters.json` file.
+Plugins consist of a folder that contains a `meta.json` and `parameters.json` file, and optionally other files that the plugin may require to run such as an executable.
 ```
 My Plugin/
   meta.json
@@ -45,7 +47,7 @@ My Plugin/
 | Arguments | The first arguments passed to the program. Can be templated, see [Variable Substitution](#Variable-Substitution). (>=v27.28)
 | BasisString | The last arguments passed to the program. Can be templated, see [Variable Substitution](#Variable-Substitution). Order of arguments is `Arguments` → `Arguments selected by user` → `BasisString`.
 | Order   | Determines when your step should run. For example, an Order of 1.5 would run between VBSP and VVIS. For the complete ordering, look at the existing compile steps in the `Parameters` folder.
-| DoRun		| This should always be true. This indicates that the step is an external program and not a built-in compile step.
+| DoRun		| Controls whether step is enabled by default. Set to `true` to enable it.
 | ReadOutput | Controls whether program output is shown in the compile log.
 | SupportsBSP | Indicates that this step can be used for BSP files. Steps that don't support BSPs are automatically disabled if a user selects a BSP file. Defaults to `false`. (>=v27.27)
 | CheckExitCode | Checks for process exit code and raises a warning when it is not 0. Defaults to `true`. (>=v27.31)

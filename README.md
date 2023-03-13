@@ -6,21 +6,22 @@
 	/>
 </p>
 
-<p align="center">Compile Pal is an easy to use wrapper for the Source map compiling tools.</p>
+<p align="center">Compile Pal is an easy to use wrapper for the Source Engine map compiling tools.</p>
 
-![ui](https://i.imgur.com/DvAVPeR.png)
+![image](https://user-images.githubusercontent.com/15372675/219901251-38a9dc7a-ab95-42c4-9794-e811521a5e89.png)
+
 
 
 ## Downloads
 
 #### Latest Release
 
-[Compile Pal V27](https://github.com/ruarai/CompilePal/releases/latest)
+[Compile Pal V28](https://github.com/ruarai/CompilePal/releases/latest)
 
 #### Experimental Releases
 Get the latest features without having to wait. Experimental releases may be unstable, use at your own risk.
 
-[Compile Pal V27.31](https://github.com/ruarai/CompilePal/releases/tag/v027.31)
+[Compile Pal V28-RC2](https://github.com/ruarai/CompilePal/releases/tag/v027.35)
 
 
 ## Features
@@ -30,14 +31,14 @@ Get the latest features without having to wait. Experimental releases may be uns
 * Cubemaps
 * Manifest Generation
 * Nav File Generation
-* Custom Compile Steps
+* Plugins and Custom Compile Steps
 * Batch Compiling
 * Much More!
 
 ## Guides
 * [Quick Start](Guides/QuickStart.md)
 * [Reporting An Issue](Guides/Issues.md)
-* [Plugin Development](Guides/Plugins.md)
+* [Plugin Development (Beta)](Guides/Plugins.md)
 * [Custom Compile Steps](Guides/Custom.md)
 * [Custom Compile Step Collection](Guides/CustomCollection.md)
 * [Command Line Arguments](Guides/CMDArgs.md)
