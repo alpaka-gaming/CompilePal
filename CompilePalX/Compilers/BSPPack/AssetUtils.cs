@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using CompilePalX;
+using CompilePalX.Compiling;
 
 namespace CompilePalX.Compilers.BSPPack
 {
@@ -424,8 +425,15 @@ namespace CompilePalX.Compilers.BSPPack
                 if (material == "")
                     break;
 
+                string radarPath = $"resource/{vmtPathParser(material, false)}";
+                // clean path so it never contains _radar
+                if (radarPath.EndsWith("_radar"))
+                {
+                    radarPath = radarPath.Replace("_radar", "");
+                }
+
                 // add default radar
-                DDSs.Add($"resource/{vmtPathParser(material, false)}_radar.dds");
+                DDSs.Add($"{radarPath}_radar.dds");
 
                 var verticalSections = subblock.GetFirstByName("\"verticalsections\"");
                 if (verticalSections == null)
@@ -433,7 +441,9 @@ namespace CompilePalX.Compilers.BSPPack
                 
                 // add multi-level radars
                 foreach (var section in verticalSections.subBlocks)
-                    DDSs.Add($"resource/{vmtPathParser(material, false)}_{section.name.Replace("\"", string.Empty)}_radar.dds");
+                {
+                    DDSs.Add($"{radarPath}_{section.name.Replace("\"", string.Empty)}_radar.dds");
+                }
             }
 
             return DDSs;
@@ -543,6 +553,47 @@ namespace CompilePalX.Compilers.BSPPack
 					foreach (string material in AssetUtils.findVmtTextures(new FileInfo(file).FullName))
 						bsp.TextureList.Add(material);
 				}
+        }
+
+        /// <summary>
+        /// Finds referenced vscripts
+        /// </summary>
+        /// <param name="fullpath">Full path to VScript file</param>
+        /// <returns>List of VSript references</returns>
+        public static List<string> FindVSCriptRefs(string fullpath)
+        {
+            List<string> includedScripts = new List<string>();
+            var script = File.ReadAllLines(fullpath);
+            var commentRegex = new Regex(@"^\/\/");
+            var functionParametersRegex = new Regex("\\((.*?)\\)");
+
+            // currently only squirrel parsing is supported
+            foreach (var line in script.Where(s => !commentRegex.IsMatch(s)))
+            {
+                // statements can also be separated with semicolons
+                var statements = line.Split(";").Where(s => !string.IsNullOrWhiteSpace(s));
+                foreach (var statement in statements)
+                {
+                    if (!statement.Contains("IncludeScript") && !statement.Contains("DoIncludeScript"))
+                    {
+                        continue;
+                    }
+
+                    Match m = functionParametersRegex.Match(statement);
+                    if (!m.Success)
+                    {
+                        CompilePalLogger.LogLineDebug($"Failed to parse function arguments {statement} in file: {fullpath}");
+                        continue;
+                    }
+                    // capture group 0 is always full match, 1 is capture
+                    var functionParameters = m.Groups[1].Value.Split(",");
+
+                    // only want 1st param (filename)
+                    includedScripts.Add(Path.Combine("scripts", "vscripts", functionParameters[0].Replace("\"", "").Trim()));
+                }
+            }
+
+            return includedScripts;
 
         }
 
@@ -734,15 +785,14 @@ namespace CompilePalX.Compilers.BSPPack
             foreach (string source in sourceDirectories)
             {
                 string externalPath = source + "/" + internalPath;
-
-                foreach (string extension in new String[] {".jpg", ".jpeg"})
+                foreach (string extension in new[] {".jpg", ".jpeg"})
                     if (File.Exists(externalPath + extension))
                         bsp.jpg = new KeyValuePair<string, string>(internalPath + ".jpg", externalPath + extension);
             }
 
-            // csgo panorama map icons (.png)
+            // csgo panorama map backgrounds (.png)
             internalPath = "materials/panorama/images/map_icons/screenshots/"; 
-            var panoramaMapIcons = new List<KeyValuePair<string, string>>();
+            var panoramaMapBackgrounds = new List<KeyValuePair<string, string>>();
             foreach (string source in sourceDirectories)
             {
                 string externalPath = source + "/" + internalPath;
@@ -750,9 +800,20 @@ namespace CompilePalX.Compilers.BSPPack
 
                 foreach (string resolution in new[] {"360p", "1080p"})
                     if (File.Exists($"{externalPath}{resolution}/{bspName}.png"))
-                        panoramaMapIcons.Add(new KeyValuePair<string, string>($"{internalPath}{resolution}/{bspName}.png", $"{externalPath}{resolution}/{bspName}.png"));
+                        panoramaMapBackgrounds.Add(new KeyValuePair<string, string>($"{internalPath}{resolution}/{bspName}.png", $"{externalPath}{resolution}/{bspName}.png"));
             }
-            bsp.PanoramaMapIcons = panoramaMapIcons;
+            bsp.PanoramaMapBackgrounds = panoramaMapBackgrounds;
+
+            // csgo panorama map icon
+            internalPath = "materials/panorama/images/map_icons/"; 
+            foreach (string source in sourceDirectories)
+            {
+                string externalPath = source + "/" + internalPath;
+                string bspName = bsp.file.Name.Replace(".bsp", "");
+                foreach (string extension in new[] {".svg"})
+                    if (File.Exists($"{externalPath }map_icon_{bspName}{extension}"))
+                        bsp.PanoramaMapIcon = new KeyValuePair<string, string>($"{internalPath}map_icon_{bspName}{extension}", $"{externalPath}map_icon_{bspName}{extension}");
+            }
 
             // csgo dz tablets
             internalPath = "materials/models/weapons/v_models/tablet/tablet_radar_" + bsp.file.Name.Replace(".bsp", ".vtf");
@@ -817,7 +878,7 @@ namespace CompilePalX.Compilers.BSPPack
                     }
                 }
             }
-            bsp.vscriptList = vscripts;
+            bsp.vscriptList = vscripts.Distinct().ToList();
         }
 
         private static string readNullTerminatedString(FileStream fs, BinaryReader reader)
@@ -832,5 +893,6 @@ namespace CompilePalX.Compilers.BSPPack
 
             return Encoding.ASCII.GetString(verString.ToArray()).Trim('\0');
         }
+
     }
 }
