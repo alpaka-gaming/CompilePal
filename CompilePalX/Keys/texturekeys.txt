@@ -55,3 +55,7 @@ $emissiveBlendFlowTexture
 srgb?$basetexture
 $iris
 $ambientoccltexture
+$mraotexture
+$emissiontexture
+$portalmasktexture
+$portalcolortexture

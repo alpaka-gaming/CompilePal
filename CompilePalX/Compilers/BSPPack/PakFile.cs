@@ -104,15 +104,6 @@ namespace CompilePalX.Compilers.BSPPack
                 AddFile(bsp.PanoramaMapIcon, (b => b.PanoramaMapIcon = default), bsp);
             }
 
-            if (bsp.res.Key != default(string))
-            {
-                if (AddFile(bsp.res, (b => b.res = default), bsp))
-                {
-                    foreach (string material in AssetUtils.findResMaterials(bsp.res.Value))
-                        AddTexture(material);
-                }
-            }
-
             if (bsp.particleManifest.Key != default(string))
             {
                 if (AddFile(bsp.particleManifest, (b => b.particleManifest = default), bsp))
@@ -169,12 +160,19 @@ namespace CompilePalX.Compilers.BSPPack
                 if (AddInternalFile(sound, FindExternalFile(sound)))
                     sndcount++;
             foreach (string vscript in bsp.vscriptList)
-            {
                 AddVScript(vscript);
-            }
             foreach (KeyValuePair<string, string> teamSelectionBackground in bsp.PanoramaMapBackgrounds)
                 if (AddInternalFile(teamSelectionBackground.Key, teamSelectionBackground.Value))
                     PanoramaMapBackgroundCount++;
+            foreach (var res in bsp.res)
+            {
+                if (AddFile(res, null, bsp))
+                {
+                    foreach (string material in AssetUtils.findResMaterials(res.Value))
+                        AddTexture(material);
+                }
+                
+            }
 
 			// add all manually included files
 			// TODO right now the manually included files search for files it depends on. Not sure if this should be default behavior
@@ -191,7 +189,7 @@ namespace CompilePalX.Compilers.BSPPack
 		        foreach (var folder in potentialSubDir)
 		        {
 			        if (fileInfo.Directory != null 
-			            && fileInfo.Directory.FullName.ToLower().Contains(folder.ToLower()))
+			            && fileInfo.Directory.FullName.Contains(folder, StringComparison.OrdinalIgnoreCase))
 			        {
 				        baseDir = folder;
 						break;
@@ -208,23 +206,23 @@ namespace CompilePalX.Compilers.BSPPack
 		        string internalPath = Regex.Replace(file, Regex.Escape(baseDir + "\\"), "", RegexOptions.IgnoreCase);
 
 				// try to determine file type by extension
-				switch (file.Split('.').Last())
+				switch (fileInfo.Extension)
 		        {
-					case "vmt":
+					case ".vmt":
 						AddTexture(internalPath);
 						break;
-					case "pcf":
+					case ".pcf":
 						AddParticle(internalPath);
 						break;
-					case "mdl":
+					case ".mdl":
 						AddModel(internalPath);
 						break;
-					case "wav":
-					case "mp3":
+					case ".wav":
+					case ".mp3":
 						AddInternalFile(internalPath, file);
 						sndcount++;
 						break;
-                    case "res":
+                    case ".res":
 						AddInternalFile(internalPath, file);
                         foreach (string material in AssetUtils.findResMaterials(file))
                             AddTexture(material);
@@ -374,7 +372,12 @@ namespace CompilePalX.Compilers.BSPPack
             // referenced scripts don't always have extension, try adding .nut
             if (externalPath == string.Empty)
             {
-                externalPath = FindExternalFile($"{internalPath}.nut");
+                var newInternalPath = $"{internalPath}.nut";
+                externalPath = FindExternalFile(newInternalPath);
+
+                // if we find the file with the .nut extension, update the internal path to include it
+                if (externalPath != string.Empty)
+                    internalPath = newInternalPath;
             }
 
             if (!AddInternalFile(internalPath, externalPath))
