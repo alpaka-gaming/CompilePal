@@ -10,6 +10,7 @@ using System.Threading;
 using CompilePalX.Compiling;
 using CompilePalX.KV;
 using CompilePalX.Utilities;
+using GlobExpressions;
 using Microsoft.Win32;
 
 namespace CompilePalX.Compilers.BSPPack
@@ -39,16 +40,6 @@ namespace CompilePalX.Compilers.BSPPack
         private const string keysFolder = "Keys";
 
         private static bool verbose;
-        private static bool dryrun;
-        private static bool renamenav;
-        private static bool include;
-        private static bool includeDir;
-        private static bool exclude;
-        private static bool excludeDir;
-        private static bool excludevpk;
-        private static bool packvpk;
-        private static bool includefilelist;
-        private static bool usefilelist;
         public static bool genParticleManifest;
 
         public static KeyValuePair<string, string> particleManifest;
@@ -63,15 +54,16 @@ namespace CompilePalX.Compilers.BSPPack
             if (!CanRun(context)) return;
 
             verbose = GetParameterString().Contains("-verbose");
-            dryrun = GetParameterString().Contains("-dryrun");
-            renamenav = GetParameterString().Contains("-renamenav");
-            include = Regex.IsMatch(GetParameterString(), @"-include\b"); // ensures it doesnt match -includedir
-            includeDir = GetParameterString().Contains("-includedir");
-            exclude = Regex.IsMatch(GetParameterString(), @"-exclude\b"); // ensures it doesnt match -excludedir
-            excludeDir = GetParameterString().Contains("-excludedir");
-            excludevpk = GetParameterString().Contains("-excludevpk");
-            packvpk = GetParameterString().Contains("-vpk");
-            includefilelist = GetParameterString().Contains("-includefilelist");
+            bool dryrun = GetParameterString().Contains("-dryrun");
+            bool renamenav = GetParameterString().Contains("-renamenav");
+            bool include = Regex.IsMatch(GetParameterString(), @"-include\b"); // ensures it doesnt match -includedir
+            bool includeDir = GetParameterString().Contains("-includedir");
+            bool exclude = Regex.IsMatch(GetParameterString(), @"-exclude\b"); // ensures it doesnt match -excludedir
+            bool excludeDir = GetParameterString().Contains("-excludedir");
+            bool excludevpk = GetParameterString().Contains("-excludevpk");
+            bool packvpk = GetParameterString().Contains("-vpk");
+            bool includefilelist = GetParameterString().Contains("-includefilelist");
+            bool addSourceDirectory = GetParameterString().Contains("-sourcedirectory");
 
             char[] paramChars = GetParameterString().ToCharArray();
             List<string> parameters = ParseParameters(paramChars);
@@ -211,6 +203,36 @@ namespace CompilePalX.Compilers.BSPPack
 
                 CompilePalLogger.LogLine("Finding sources of game content...");
                 sourceDirectories = GetSourceDirectories(gameFolder);
+
+                if (addSourceDirectory)
+                {
+                    foreach (string parameter in parameters)
+                    {
+                        if (!parameter.Contains("sourcedirectory"))
+                        {
+                            continue;
+                        }
+
+                        var glob = parameter.Replace("\"", "")
+                            .Replace("sourcedirectory ", "")
+                            .Replace('/', '\\')
+                            .ToLower().TrimEnd(' ');
+
+                        string root = Directory.GetDirectoryRoot(glob);
+
+                        var globResults = Glob.Directories(root, glob.Substring(root.Length), GlobOptions.CaseInsensitive);
+                        if (globResults.Count() == 0)
+                        {
+                            CompilePalLogger.LogCompileError($"Found no matching folders for: {glob}\n",
+                                new Error($"Found no matching folders for: {glob}", ErrorSeverity.Caution));
+                            continue;
+                        }
+
+                        foreach (string path in globResults)
+                            sourceDirectories.Add(root + path);
+                    }
+                }
+
                 if (verbose)
                 {
                     CompilePalLogger.LogLine("Source directories:");
@@ -379,6 +401,8 @@ namespace CompilePalX.Compilers.BSPPack
                     CompilePalLogger.LogLine(pakfile.vscriptcount + " vscripts found");
                 if (pakfile.PanoramaMapBackgroundCount != 0)
                     CompilePalLogger.LogLine(pakfile.PanoramaMapBackgroundCount + " Panorama map backgrounds found");
+                if (map.res.Count != 0)
+                    CompilePalLogger.LogLine(map.res.Count + " res files found");
                 string additionalFiles =
                     (map.nav.Key != default(string) ? "\n-Nav file" : "") +
                     (map.soundscape.Key != default(string) ? "\n-Soundscape" : "") +
@@ -390,8 +414,7 @@ namespace CompilePalX.Compilers.BSPPack
                     (map.txt.Key != default(string) ? "\n-Loading screen text" : "") +
                     (map.jpg.Key != default(string) ? "\n-Loading screen image" : "") +
                     (map.PanoramaMapIcon.Key != default(string) ? "\n-Panorama map icon" : "") +
-                    (map.kv.Key != default(string) ? "\n-KV file" : "") +
-                    (map.res.Key != default(string) ? "\n-Res file" : "");
+                    (map.kv.Key != default(string) ? "\n-KV file" : "");
 
                 if (additionalFiles != "")
                     CompilePalLogger.LogLine("Additional Files: " + additionalFiles);
@@ -854,7 +877,13 @@ namespace CompilePalX.Compilers.BSPPack
             var paths = new Dictionary<string, string?>();
             foreach ((string basePath, string steamId) in locations)
             {
-                var installationFolder = new AppManifestParser(Path.Combine(basePath, $"appmanifest_{steamId}.acf")).GetInstallationDirectory();
+                var appManifestPath = Path.Combine(basePath, $"appmanifest_{steamId}.acf");
+                if (!File.Exists(appManifestPath))
+                {
+                    CompilePalLogger.LogCompileError($"App Manifest {appManifestPath} does not exist, ignoring\n", new Error($"App Manifest does not exist, ignoring\n", ErrorSeverity.Warning));
+                    continue;
+                }
+                var installationFolder = new AppManifestParser(appManifestPath).GetInstallationDirectory();
                 paths[steamId] = Path.Combine(basePath, "common", installationFolder);
             }
 
