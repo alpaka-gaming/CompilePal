@@ -13,14 +13,8 @@ namespace CompilePalX.Compilers
 {
     class CompileExecutable : CompileProcess
     {
-        public CompileExecutable(string metadata)
-            : base(metadata)
-        {
-            if (!Directory.Exists(runningDirectory))
-                Directory.CreateDirectory(runningDirectory);
-        }
-
-        private static string runningDirectory = ".";
+        public CompileExecutable(string metadata) : base(metadata) { }
+        
 
         public override void Run(CompileContext c, CancellationToken cancellationToken)
         {
@@ -54,9 +48,16 @@ namespace CompilePalX.Compilers
 
             var args = GameConfigurationManager.SubstituteValues(GetParameterString(), c.MapFile);
 
+            bool normalPriority = false;
+            if (args.Contains("-normal_priority"))
+            {
+                args = args.Replace("-normal_priority", string.Empty);
+                normalPriority = true;
+            }
+
             Process.StartInfo.FileName = GameConfigurationManager.SubstituteValues(Metadata.Path);
             Process.StartInfo.Arguments = string.Join(" ", args);
-            Process.StartInfo.WorkingDirectory = runningDirectory;
+            Process.StartInfo.WorkingDirectory = GameConfigurationManager.GameConfiguration.BinFolder;
 
             CompilePalLogger.LogLineDebug($"Running '{Process.StartInfo.FileName}' with args '{Process.StartInfo.Arguments}'");
 
@@ -75,7 +76,14 @@ namespace CompilePalX.Compilers
                 CompilePalLogger.LogCompileError($"Failed to run executable: {Process.StartInfo.FileName}\n", new Error($"Failed to run executable: {Process.StartInfo.FileName}", ErrorSeverity.FatalError));
                 return;
             }
-            Process.PriorityClass = ProcessPriorityClass.BelowNormal;
+
+            if (normalPriority)
+            {
+                Process.PriorityClass = ProcessPriorityClass.Normal;
+                CompilePalLogger.LogLine($"Running {Name} with normal priority");
+            }
+            else 
+                Process.PriorityClass = ProcessPriorityClass.BelowNormal;
 
             if (Metadata.ReadOutput)
             { 
