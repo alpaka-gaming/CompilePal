@@ -50,6 +50,78 @@ namespace CompilePalX.Compilers.BSPPack
             return false;
         }
 
+        /// <summary>
+        /// Adds a generic file dependency and tries to determine file type by extension
+        /// </summary>
+        /// <param name="internalPath"></param>
+        /// <param name="externalPath"></param>
+        private void AddGenericFile(string internalPath, string externalPath)
+        {
+            FileInfo fileInfo = new FileInfo(externalPath);
+
+            // try to determine file type by extension
+            switch (fileInfo.Extension)
+            {
+                case ".vmt":
+                    AddTexture(internalPath);
+                    break;
+                case ".pcf":
+                    AddParticle(internalPath);
+                    break;
+                case ".mdl":
+                    AddModel(internalPath);
+                    break;
+                case ".wav":
+                case ".mp3":
+                    AddSound(internalPath);
+                    break;
+                case ".res":
+                    AddInternalFile(internalPath, externalPath);
+                    foreach (string material in AssetUtils.findResMaterials(externalPath))
+                        AddTexture(material);
+                    break;
+                case ".nut":
+                    AddVScript(internalPath);
+                    break;
+                default:
+                    AddInternalFile(internalPath, externalPath);
+                    break;
+            }
+        }
+        private bool AddFile(string externalPath)
+        {
+            if (!File.Exists(externalPath))
+                return false;
+
+            // try to get the source directory the file is located in
+            FileInfo fileInfo = new FileInfo(externalPath);
+
+            // default base directory is the game folder
+            string baseDir = GameConfigurationManager.GameConfiguration.GameFolder;
+
+            var potentialSubDir = new List<string>(sourceDirs); // clone to prevent accidental modification
+            potentialSubDir.Remove(baseDir);
+            foreach (var folder in potentialSubDir)
+            {
+                if (fileInfo.Directory != null 
+                    && fileInfo.Directory.FullName.Contains(folder, StringComparison.OrdinalIgnoreCase))
+                {
+                    baseDir = folder;
+                    break;
+                }
+            }
+
+            // check needed for when file does not exist in any sub directory or the base directory
+            if (fileInfo.Directory != null && !fileInfo.Directory.FullName.ToLower().Contains(baseDir.ToLower())) {
+                return false;
+            }
+
+            string internalPath = Regex.Replace(externalPath, Regex.Escape(baseDir + "\\"), "", RegexOptions.IgnoreCase);
+
+            AddGenericFile(internalPath, externalPath);
+            return true;
+        }
+
         private List<string> excludedFiles;
 	    private List<string> excludedDirs;
         private List<string> excludedVpkFiles;
@@ -60,22 +132,24 @@ namespace CompilePalX.Compilers.BSPPack
         public int mdlcount { get; private set; }
         public int vmtcount { get; private set; }
         public int pcfcount { get; private set; }
-        public int sndcount { get; private set; }
+        public int soundcount { get; private set; }
         public int vehiclescriptcount { get; private set; }
         public int effectscriptcount { get; private set; }
         public int vscriptcount { get; private set; }
         public int PanoramaMapBackgroundCount { get; private set; }
 
-        public PakFile(BSP bsp, List<string> sourceDirectories, List<string> includeFiles, List<string> excludedFiles, List<string> excludedDirs, List<string> excludedVpkFiles, string outputFile)
+        private bool noSwvtx;
+
+        public PakFile(BSP bsp, List<string> sourceDirectories, List<string> includeFiles, List<string> excludedFiles, List<string> excludedDirs, List<string> excludedVpkFiles, string outputFile, bool noswvtx)
         {
-            mdlcount = vmtcount = pcfcount = sndcount = vehiclescriptcount = effectscriptcount = PanoramaMapBackgroundCount = 0;
+            mdlcount = vmtcount = pcfcount = soundcount = vehiclescriptcount = effectscriptcount = PanoramaMapBackgroundCount = 0;
             sourceDirs = sourceDirectories;
             fileName = outputFile;
+            noSwvtx = noswvtx;
 
 	        this.excludedFiles = excludedFiles;
 	        this.excludedDirs = excludedDirs;
 	        this.excludedVpkFiles = excludedVpkFiles;
-
             Files = new Dictionary<string, string>();
 
             if (bsp.nav.Key != default(string))
@@ -118,8 +192,7 @@ namespace CompilePalX.Compilers.BSPPack
                 if (AddFile(bsp.soundscape, (b => b.soundscape = default), bsp))
                 {
                     foreach (string sound in AssetUtils.findSoundscapeSounds(bsp.soundscape.Value))
-                        if (AddInternalFile(sound, FindExternalFile(sound)))
-                            sndcount++;
+                        AddSound(sound);
                 }
             }
             
@@ -128,15 +201,9 @@ namespace CompilePalX.Compilers.BSPPack
                 if (AddFile(bsp.soundscript, (b => b.soundscript = default), bsp))
                 {
                     foreach (string sound in AssetUtils.findSoundscapeSounds(bsp.soundscript.Value))
-                        if (AddInternalFile(sound, FindExternalFile(sound)))
-                            sndcount++;
+                        AddSound(sound);
                 }
             }
-
-            // find color correction files
-            foreach (Dictionary<string, string> cc in bsp.entityList.Where(item => item["classname"] == "color_correction"))
-                if (cc.ContainsKey("filename"))
-                    AddInternalFile(cc["filename"], FindExternalFile(cc["filename"]));
 
             foreach (KeyValuePair<string, string> vehicleScript in bsp.VehicleScriptList)
                 if (AddInternalFile(vehicleScript.Key, vehicleScript.Value))
@@ -156,9 +223,10 @@ namespace CompilePalX.Compilers.BSPPack
                 AddTexture(vmt);
             foreach (string vmt in bsp.EntTextureList)
                 AddTexture(vmt);
+            foreach (string misc in bsp.MiscList)
+                AddInternalFile(misc, FindExternalFile(misc));
             foreach (string sound in bsp.EntSoundList)
-                if (AddInternalFile(sound, FindExternalFile(sound)))
-                    sndcount++;
+                AddSound(sound);
             foreach (string vscript in bsp.vscriptList)
                 AddVScript(vscript);
             foreach (KeyValuePair<string, string> teamSelectionBackground in bsp.PanoramaMapBackgrounds)
@@ -175,62 +243,10 @@ namespace CompilePalX.Compilers.BSPPack
             }
 
 			// add all manually included files
-			// TODO right now the manually included files search for files it depends on. Not sure if this should be default behavior
 	        foreach (var file in includeFiles)
 	        {
-				// try to get the source directory the file is located in
-				FileInfo fileInfo = new FileInfo(file);
-
-				// default base directory is the game folder
-		        string baseDir = GameConfigurationManager.GameConfiguration.GameFolder;
-
-		        var potentialSubDir = new List<string>(sourceDirs); // clone to prevent accidental modification
-				potentialSubDir.Remove(baseDir);
-		        foreach (var folder in potentialSubDir)
-		        {
-			        if (fileInfo.Directory != null 
-			            && fileInfo.Directory.FullName.Contains(folder, StringComparison.OrdinalIgnoreCase))
-			        {
-				        baseDir = folder;
-						break;
-			        }
-		        }
-
-                // check needed for when file does not exist in any sub directory or the base directory
-                if (fileInfo.Directory != null && !fileInfo.Directory.FullName.ToLower().Contains(baseDir.ToLower()))
-                {
+                if (!AddFile(file))
                     CompilePalLogger.LogCompileError($"Failed to resolve internal path for {file}, skipping\n", new Error($"Failed to resolve internal path for {file}, skipping", ErrorSeverity.Error));
-                    continue;
-                }
-
-		        string internalPath = Regex.Replace(file, Regex.Escape(baseDir + "\\"), "", RegexOptions.IgnoreCase);
-
-				// try to determine file type by extension
-				switch (fileInfo.Extension)
-		        {
-					case ".vmt":
-						AddTexture(internalPath);
-						break;
-					case ".pcf":
-						AddParticle(internalPath);
-						break;
-					case ".mdl":
-						AddModel(internalPath);
-						break;
-					case ".wav":
-					case ".mp3":
-						AddInternalFile(internalPath, file);
-						sndcount++;
-						break;
-                    case ".res":
-						AddInternalFile(internalPath, file);
-                        foreach (string material in AssetUtils.findResMaterials(file))
-                            AddTexture(material);
-                        break;
-                    default:
-						AddInternalFile(internalPath, file);
-						break;
-		        }
 	        }
 		}
 
@@ -267,6 +283,8 @@ namespace CompilePalX.Compilers.BSPPack
         public bool AddInternalFile(string internalPath, string externalPath)
         {
                 internalPath = internalPath.Replace("\\", "/");
+                // sometimes internal paths can be relative, ex. "materials/vgui/../hud/logos/spray.vmt" should be stored as "materials/hud/logos/spray.vmt".
+                internalPath = Regex.Replace(internalPath, @"\/.*\/\.\.", "");
                 if (!Files.ContainsKey(internalPath))
                 {
                     return AddFile(internalPath, externalPath);
@@ -288,12 +306,29 @@ namespace CompilePalX.Compilers.BSPPack
                 foreach (string reference in AssetUtils.findMdlRefs(internalPath))
                 {
                     string ext_path = FindExternalFile(reference);
-                    AddInternalFile(reference, FindExternalFile(reference));
+
+                    //don't pack .sw.vtx files if param is set
+                    if (reference.EndsWith(".sw.vtx") && this.noSwvtx) 
+                        continue;
+
+                    AddInternalFile(reference, ext_path);
+
                     if (reference.EndsWith(".phy"))
                         foreach (string gib in AssetUtils.findPhyGibs(ext_path))
                             AddModel(gib);
-                    else if (reference.EndsWith(".vtx"))
-                        vtxMaterialNames.AddRange(AssetUtils.FindVtxMaterials(ext_path));
+
+                    if (reference.EndsWith(".vtx"))
+                    {
+                        try
+                        {
+                            vtxMaterialNames.AddRange(AssetUtils.FindVtxMaterials(ext_path));
+                        } catch (Exception e)
+                        {
+                            ExceptionHandler.LogException(e, false);
+                            CompilePalLogger.LogCompileError($"Failed to find vtx materials for file {ext_path}", new Error($"Failed to find vtx materials for file {ext_path}", ErrorSeverity.Error));
+                        }
+
+                    }
                 }
 
                 Tuple<List<string>, List<string>> mdlMatsAndModels;
@@ -312,7 +347,7 @@ namespace CompilePalX.Compilers.BSPPack
 					AddTexture(mat);
 
 	            foreach (var model in mdlMatsAndModels.Item2)
-					AddModel(model);
+					AddModel(model, null);
 
             }
         }
@@ -361,6 +396,16 @@ namespace CompilePalX.Compilers.BSPPack
             }
         }
 
+        public void AddSound(string internalPath)
+        {
+            // adds vmt files and finds its dependencies
+            string externalPath = FindExternalFile(internalPath);
+            if (AddInternalFile(internalPath, externalPath))
+            {
+                soundcount++;
+            }
+        }
+
         /// <summary>
         /// Adds VScript file and finds it's dependencies
         /// </summary>
@@ -387,8 +432,37 @@ namespace CompilePalX.Compilers.BSPPack
             }
             vscriptcount++;
 
-            foreach (string vscript in AssetUtils.FindVSCriptRefs(externalPath))
+            var (vscripts, models, sounds, includedFiles, includedDirectories) = AssetUtils.FindVScriptDependencies(externalPath);
+            foreach (string vscript in vscripts)
                 AddVScript(vscript);
+            foreach (string model in models)
+                AddModel(model);
+            foreach (string sound in sounds)
+                AddSound(sound);
+            foreach (string internalDirectoryPath in includedDirectories)
+            {
+                var externalDirectoryPath = FindExternalDirectory(internalDirectoryPath);
+                if (externalDirectoryPath is null) {
+                    CompilePalLogger.LogCompileError($"Failed to resolve external path for VScript hint {internalDirectoryPath}, skipping\n", new Error($"Failed to resolve external path for VScript hint {internalDirectoryPath}, skipping", ErrorSeverity.Error));
+                    continue;
+                }
+
+                var files = Directory.GetFiles(externalDirectoryPath, "*", SearchOption.AllDirectories);
+                foreach (var file in files)
+                {
+                    AddFile(file);
+                }
+            }
+            foreach (string internalFilePath in includedFiles)
+            {
+                var externalFilePath = FindExternalFile(internalFilePath);
+                if (!File.Exists(externalFilePath)) {
+                    CompilePalLogger.LogCompileError($"Failed to resolve external path for VScript hint {internalFilePath}, skipping\n", new Error($"Failed to resolve external path for VScript hint {internalFilePath}, skipping", ErrorSeverity.Error));
+                    continue;
+                }
+
+                AddGenericFile(internalFilePath, externalPath);
+            }
         }
 
         private string FindExternalFile(string internalPath)
@@ -398,11 +472,25 @@ namespace CompilePalX.Compilers.BSPPack
 
 	        var sanitizedPath = SanitizePath(internalPath);
 
-			foreach (string source in sourceDirs)
-                if (File.Exists(source +"/"+ sanitizedPath))
-                    return source + "/" + sanitizedPath.Replace("\\", "/");
+            foreach (string source in sourceDirs)
+                if (File.Exists(Path.Combine(source, sanitizedPath)))
+                    return Path.Combine(source, sanitizedPath.Replace("\\", "/"));
             return "";
         }
+
+        private string? FindExternalDirectory(string internalPath)
+        {
+            // Attempts to find the directory from the internalPath
+            // returns the externalPath or null
+
+	        var sanitizedPath = SanitizePath(internalPath);
+
+            foreach (string source in sourceDirs)
+                if (Directory.Exists(Path.Combine(source, sanitizedPath)))
+                    return Path.Combine(source, sanitizedPath.Replace("\\", "/"));
+            return null;
+        }
+
 
 		private static readonly string invalidChars = Regex.Escape(new string(Path.GetInvalidPathChars()));
 		private static readonly string invalidRegString = $@"([{invalidChars}]*\.+$)|([{invalidChars}]+)";
